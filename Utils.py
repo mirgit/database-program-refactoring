@@ -1,11 +1,7 @@
 class Hole:
-    def __init__(self, phi, attr):
-        self.attr = attr
-        self.phi = phi
-
-    def infer(self):
-        hole = self.phi[self.attr]
-        return hole
+    def __init__(self, id, options):
+        self.id = id
+        self.options = options
 
 
 class Predicate:
@@ -19,3 +15,8 @@ class Predicate:
         lhs = Hole(phi, self.lhs).infer()
         rhs = Hole(phi, self.rhs).infer()
         return Predicate(lhs, rhs, self.operand)
+
+
+class PredicateHole:
+    def __init__(self):
+        pass

@@ -30,14 +30,23 @@ class Delete:  # del(tables,j,phi)
         for table in self.tablelist:
             database[table].delete()
 
+
 class Project:  # proj(attrs, Q(j))
     def __init__(self, attrs, query):
+        self.attrs = attrs
+        self.query = query
+
+    def run(self, database):
+        pass
 
 
 class Filter:  # filter(phi,Q)
     def __init__(self, predicate, query):
         self.query = query
         self.predicate = predicate
+
+    def run(self, database):
+        pass
 
     def infer(self):
         pred = self.predicate.infer()
