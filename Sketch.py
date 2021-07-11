@@ -1,6 +1,7 @@
 import subprocess
 
 from z3 import *
+
 class Sketch:
     def __init__(self, program, phi):
         self.program = program  # dict of func_name:list of query/update objects
@@ -9,10 +10,15 @@ class Sketch:
         self.phi = phi
         self.holes_value = {}
         self.solver = None
+    
+    
     def generateSketch(self):
-        pass
-
-
+        for m in self.program:
+            self.sketch[m] = []
+            for t in self.program[m]:
+                t_hole = t.Holer()
+                self.sketch[m].append(t_hole)
+                
 
     def encodeSketch(self):
         parameters = []
@@ -33,5 +39,6 @@ class Sketch:
             ## add not(solution) to constraints
 
     def completeSketch(self):
+        pass
 
 
