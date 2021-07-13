@@ -1,17 +1,35 @@
 import sqlparse
 from Transactions import *
+from ValueCorrespondance import ValCorrGenerator
+# from Schema import Schema
+from JoinCorrSuplier import JoinCorrSupplier
+from Schema_provider import SchemaProvider
 
+
+# ********test*********
+
+src = './benchmarks/bench1/src-schema.txt'
+tgt = './benchmarks/bench1/tgt-schema.txt'
+S = SchemaProvider(src, tgt)
+src_schema,tgt_schema = [S.src_schema,S.tgt_schema]
+# oldSchema = {'A': {'B': 'int', 'C': 'int'}}
+# newSchema = {'M': {'B': 'int'}, 'N': {'D': 'bool', 'E': 'int'}}
+# S1 = Schema(oldSchema)
+# S2 = Schema(newSchema)
+phi = ValCorrGenerator(src_schema, tgt_schema)
+join_supplier = JoinCorrSupplier(src_schema,tgt_schema)
 q = 'SELECT A.i, B.i FROM A JOIN B ON A.a = B.b WHERE A.c = 5'
 u = 'SELECT CustomerID FROM Customer WHERE Name = <name>;'
 u = 'SELECT order_items.order_id, items.name, order_items.quantity FROM order_items JOIN items ON order_items.item_id = items.id WHERE order_items.id = <id>;'
 # u = 'UPDATE A SET A.b = 5 WHERE A.c = 2'
 # u = 'UPDATE customers SET customers.email = email WHERE customers.id = id;'
-# u = 'INSERT INTO Customer (CustomerID, Fname) VALUES (id, name);'
+u = 'INSERT INTO A (B, C) VALUES (3, 4);'
+u = 'INSERT INTO ADDRESS (aid, address, city, state, zipcode) VALUES (FRESH(1), <addr>, <ct>, <st>, <zip>);'
 # u = 'DELETE FROM line_items WHERE line_items.id = <id>;'
 parsed_query = sqlparse.parse(u)[0]
 hq = sqlparse.parse(q)[0]
 # print(hu.tokens,'\n', hq.tokens)
-[print(i.ttype,i) for i in parsed_query.tokens]
+# [print(i.ttype,i) for i in parsed_query.tokens]
 if parsed_query[0].value == 'UPDATE':
     jc = parsed_query[2]
     attr,value = [i.strip() for i in parsed_query[6].value.split('=')]
@@ -24,14 +42,17 @@ if parsed_query[0].value == 'UPDATE':
     # print(parsed_query.token_next(0))
 elif parsed_query[0].value == 'DELETE':
     jc = [parsed_query[4].value]
-    l, op, r = [ i.strip() for i in parsed_query[6].value.replace(';','').split()[1:4]]
-    transaction = Delete(jc,jc,Predicate(l,r,op))
+    l, op, r = [i.strip() for i in parsed_query[6].value.replace(';', '').split()[1:4]]
+    transaction = Delete(jc, jc, Predicate(l, r, op))
 
 elif parsed_query[0].value == 'INSERT':
     jc = parsed_query[4].value.split()[0].strip()
-    attrs = [i.replace(',','').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
-    vals = [i.replace(',','').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
-    ins = {attrs[i]:vals[i] for i in range(len(vals))}
+    jc = [src_schema.get_table(t) for t in jc.split(',')]
+    attrs = [i.replace(',', '').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
+    vals = [i.replace(',', '').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
+    ins = {attrs[i]: vals[i] for i in range(len(vals))}
     transaction = Insert(jc, ins)
+    # transaction.to_sql()
+    transaction.genSketch(phi, join_supplier)
 elif parsed_query[0].value == 'SELECT':
     attrs = [i.strip() for i in parsed_query[2].value.split(',')]

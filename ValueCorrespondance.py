@@ -1,5 +1,4 @@
 from Levenshtein import distance as levenshtein_distance
-from Schema import Schema
 from z3 import *
 
 

@@ -1,15 +1,15 @@
 from Schema import Schema
-from SqliteDB import SqliteDB
-import re
+# from SqliteDB import SqliteDB
+# import re
 
 from Table import Table
 
-src = './benchmark/bench1/src-schema.txt'
-tgt = './benchmark/bench1/tgt-schema.txt'
+# src = './benchmark/bench1/src-schema.txt'
+# tgt = './benchmark/bench1/tgt-schema.txt'
 
 
 class SchemaProvider:
-    def __init__(self, src_schema_file=src, tgt_schema_file=tgt):
+    def __init__(self, src_schema_file, tgt_schema_file):
         # self.src_db = SqliteDB("./src_db.sqlite")
         # self.tgt_db = SqliteDB("./tgt_db.sqlite")
         #
@@ -39,18 +39,19 @@ class SchemaProvider:
         
     def create_tables(self, table_queries):#, db, schema):
         schema = {}
+        tables = []
         for q in table_queries:
             # db.execute_query(q)
             # if q[-1] == ' ':
             #     print("yredjtyhfhhh")
             #     del q[-1]
             table_info = self.parse_table(q)
-            table = Table(table_info['name'], table_info['columns'], table_info['primaryKey'], table_info['foreignKeys'])
+            tables.append(Table(table_info['name'], table_info['columns'], table_info['primaryKey'], table_info['foreignKeys']))
             schema[table_info['name']] = {i[0]: i[1] for i in table_info['columns']}
             # for s[table.name] = table.columns
             # schema.tables.append(table)
 
-        return schema, table
+        return schema, tables
 
     def parse_table(self, q):
         info = {}
@@ -81,4 +82,4 @@ class SchemaProvider:
         info['primaryKey'] = PK
         info['foreignKeys'] = FK
         return info
-s = SchemaProvider()
+# s = SchemaProvider()

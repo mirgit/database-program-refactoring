@@ -4,11 +4,15 @@ class Schema:
         self.cols = {t + '.' + x: self.schema[t][x] for t in self.schema for x in self.schema[t]}
         self.attr2id = {c: i+1 for i, c in enumerate(self.cols)}
         self.id2attr = {self.attr2id[c]: c for c in self.attr2id}
-        self.tables = tables; 
+        self.tables = tables
 
     def __str__(self):
-        return "".format("SchemaDef(%s)", self.tables);
-    
+        return "".format("SchemaDef(%s)", self.tables)
+
+    def get_table(self,table_name):
+        for t in self.tables:
+            if t.name == table_name:
+                return t
     def name_to_id(self, a):  # if not exist...!!!!!!!!
         return self.attr2id[a]
 

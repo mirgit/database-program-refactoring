@@ -1,46 +1,66 @@
 from itertools import combinations
 
-#### project(['name','Id'],select('name'=='mammad',teacher*student))
+# project(['name','Id'],select('name'=='mammad',teacher*student))
+from Utils import JoinChain
 
 
 class Hole:
-    def __init__(self, id, options):
-        self.id = id
+    def __init__(self, hid, options):
+        self.hid = hid
         self.options = options
 
-    def infer(self):
-        pass#!!!!!!!!!!!!!!!!!!!!!!!!1
+    # def infer(self):
+    #     pass#!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-def attr_infer(phi, attr):
+def fill_val(phi, attr):
     return phi[attr]
 
 
-class Predicate:
-    def __init__(self, lhs, rhs, operand):
-        self.lhs = lhs
-        self.rhs = rhs
-        self.operand = operand
-        # operands = {'gt', 'st', 'eq', 'ge', 'se'}
-
-    def infer(self, phi):
-        lhs = Hole(phi, self.lhs).infer()
-        rhs = Hole(phi, self.rhs).infer()
-        return Predicate(lhs, rhs, self.operand)
-
-
+def attr_infer(phi, attr):
+    # holes = []
+    #     holes.append(Hole(id,))
+    return phi[attr]
 
 class Insert:  # ins(j,{a_i:v_i...})
     def __init__(self, join_chain, values):
-        self.join_chain = join_chain
+        self.join_chain = JoinChain(join_chain)
         self.values = values
+        self.holes = []
+        self.sk_join_chain = None
+        # self.sk_values = None
+        self.holes_id = 0
+    # def Holer(self):
+    #     return InsertHole(self.join_chain,self.values)
 
-    def run(self, database):
-        for table in self.join_chain:
-            database[table].insert(self.values)
+    def genSketch(self, phi, join_corr_supplier):
+        self.holes= self.join_chain.genSketch(phi, join_corr_supplier)
+        # self.sk_values = {}
+        for a in self.values:
+            self.holes.append(attr_infer(phi, a))
+            # self.sk_values[h.hid] = self.values[a]
+        return self.holes, self.holes_id+len(self.holes)
 
-    def Holer(self):
-        return InsertHole(self.join_chain,self.values)
+    def fill(self, holes_value):
+        J = self.sk_join_chain.fill(holes_value)
+        holes_value.pop(0)
+        V = {}
+        for v in self.values:
+            V[holes_value[0]] = self.values[v]
+            holes_value.pop(0)
+        return holes_value, Insert(J, V)
+
+    def to_sql(self):
+        sql = 'INSERT INTO ' + self.join_chain.to_sql()
+        cols = []
+        vals = []
+        for c in self.values:
+            cols.append(c)
+            vals.append(self.values[c])
+        sql = sql + ' '+str(tuple(cols))+' VALUES '+str(tuple(vals))+';'
+        return sql
+
+
 
 
 class Update:  # upd(j,pred,attr,val)
@@ -84,6 +104,27 @@ class Project:  # proj(attrs, Q(j))
         return ProjectHole(self.attrs,self.query)
 
 
+class Predicate:
+    def __init__(self, lhs, rhs, operand):
+        self.lhs = lhs
+        self.rhs = rhs
+        self.operand = operand
+        # operands = {'>', '<', '=', '<=', '>='}
+
+    def genSketch(self):
+        pass
+
+    def fill(self):
+        pass
+
+    def to_sql(self):
+        pass
+    def infer(self, phi):
+        lhs = Hole(phi, self.lhs).infer()
+        rhs = Hole(phi, self.rhs).infer()
+        return Predicate(lhs, rhs, self.operand)
+
+
 class Filter:  # filter(phi,Q)
     def __init__(self, predicate, query):
         self.query = query
@@ -107,7 +148,8 @@ class Filter:  # filter(phi,Q)
 
 class PredicateHole:
     def __init__(self, lhs, rhs, operand):
-        self.rhs = attr_infer(rhs)
+        self.rhs = attr_infer(
+            rhs)
         self.lhs = attr_infer(lhs)
         self.operand = operand
 
@@ -210,15 +252,4 @@ class FilterHole:  # filter(pred,Q)
     #     return Filter(pred, query)
     #
 
-
-def joinChainToSql(join_chain):
-    if len(join_chain)==0:
-        return ''
-    join_sql = join_chain[0][0]
-    join_chain = join_chain.pop(0)
-    for j in join_chain:
-        join_chain += ' JOIN ' 
-        join_chain += j[0] 
-        join_chain += " ON "
-        join_chain +=  j[1][0] + " = " + j[1][1]
         
