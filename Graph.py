@@ -6,6 +6,12 @@ class Vertex:
         self.adj_vertices = []
         self.visited = False
     
+    
+class Edge:
+    def __init__(self, u, v):
+        self.src = u
+        self.tgt = v
+
 
 class Graph:
     def __init__(self, vertices=[]):
@@ -17,8 +23,8 @@ class Graph:
         v.visited = True
         temp.append(v)
         for i in v.adj_vertices:
-            if i.visited == False:
-                temp = self.DFSUtil(temp, i)
+            if i[0].visited == False:
+                temp = self.DFSUtil(temp, i[0])
         return temp
     
     def addVertex(self, vertex):
@@ -31,8 +37,9 @@ class Graph:
     
     
     def addEdge(self, v, w):
-        v.adj_vertices.append(w)
-        w.adj_vertices.append(v)
+        edge = Edge(v, w)
+        v.adj_vertices.append((w, edge))
+        w.adj_vertices.append((v, edge))
         
         
     def connectedComponents(self):
@@ -53,10 +60,10 @@ class Graph:
     
     # DFS function
     def dfs(self, x, temp) :
-        self.visited[x] = True;
+        self.visited[x[0]] = True;
         temp.append(x)
-        for i in x.adj_vertices :
-            if i in self.vertices and not self.visited[i] :
+        for i in x[0].adj_vertices :
+            if i[0] in self.vertices and not self.visited[i[0]] :
                 temp = self.dfs(i, temp)
         return temp
 
@@ -64,16 +71,16 @@ class Graph:
         # Call for correct direction
         if self.vertex_count<0:
             return False
-        self.dfs(self.vertices[0])
+        self.dfs((self.vertices[0], None),[])
         for i in self.visited :
-            if (not self.visited[i]) :
+            if (not self.visited[i[0]]) :
                 return False
         return True   
     
     def getSpaning(self):
         if self.vertex_count<0:
             return []
-        spanning = self.dfs(self.vertices[0],[])
+        spanning = self.dfs((self.vertices[0], None),[])
         for i in self.visited :
             if (not self.visited[i]) :
                 return []
@@ -103,5 +110,7 @@ if __name__ == "__main__" :
             joinChain = sg.getSpaning()
             if len(joinChain) > 0:
                 ret.add(tuple(joinChain))
-        print(list(map(list, ret)))
+        for r in ret:
+            print(r)
+        # print(list(map(list, ret)))
 

@@ -26,7 +26,7 @@ class JoinCorrSupplier:
                 if (fk_table is None or ref_table is None):
                     raise Exception("Cannot find dest or ref vertex") 
         
-                graph.addEdge(fk_table, ref_table) 
+                graph.addEdge(fk_table, ref_table, (src[0], dest[0])) 
                 
         # decompose to connected components and update the map
         components = graph.connectedComponents() 
@@ -68,8 +68,8 @@ class JoinCorrSupplier:
         for sg in subgraphs:
             joinChain = sg.getSpaning()
             if len(joinChain) > 0:
-                ret.add(joinChain)
-        return ret 
+                ret.add(tuple(joinChain))
+        return list(map(list, ret))
     
     
     def tablesMappedTo(self, value_corr, columns):
