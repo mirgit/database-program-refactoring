@@ -8,9 +8,10 @@ class Vertex:
     
     
 class Edge:
-    def __init__(self, u, v):
+    def __init__(self, u, v, fk):
         self.src = u
         self.tgt = v
+        self.on = fk
 
 
 class Graph:
@@ -36,8 +37,8 @@ class Graph:
         return vertex
     
     
-    def addEdge(self, v, w):
-        edge = Edge(v, w)
+    def addEdge(self, v, w, fk):
+        edge = Edge(v, w, fk)
         v.adj_vertices.append((w, edge))
         w.adj_vertices.append((v, edge))
         
@@ -111,6 +112,6 @@ if __name__ == "__main__" :
             if len(joinChain) > 0:
                 ret.add(tuple(joinChain))
         for r in ret:
-            print(r)
+            print(r[0].val, r[1].on)
         # print(list(map(list, ret)))
 
