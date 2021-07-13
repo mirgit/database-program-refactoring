@@ -211,3 +211,15 @@ class Predicate:
         rhs = Hole(phi, self.rhs).infer()
         return Predicate(lhs, rhs, self.operand)
 
+    
+def joinChainToSql(join_chain):
+    if len(join_chain)==0:
+        return ''
+    join_sql = join_chain[0][0]
+    join_chain = join_chain.pop(0)
+    for j in join_chain:
+        join_chain += ' JOIN ' 
+        join_chain += j[0] 
+        join_chain += " ON "
+        join_chain +=  j[1][0] + " = " + j[1][1]
+        
