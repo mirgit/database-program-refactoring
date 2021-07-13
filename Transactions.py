@@ -3,19 +3,31 @@ from itertools import combinations
 #### project(['name','Id'],select('name'=='mammad',teacher*student))
 
 
-class PredicateHole:
-    def __init__(self, lhs, rhs, operand):
-        self.rhs = attr_infer(rhs)
-        self.lhs = attr_infer(lhs)
-        self.operand = operand
-
-    def fill(self):
-        L = attr_infer(self.lhs)
-        R = attr_infer(self.rhs)
-        return Predicate(L,R, self.operand)
+class Hole:
+    def __init__(self, id, options):
+        self.id = id
+        self.options = options
 
     def infer(self):
-        return self
+        pass#!!!!!!!!!!!!!!!!!!!!!!!!1
+
+
+def attr_infer(phi, attr):
+    return phi[attr]
+
+
+class Predicate:
+    def __init__(self, lhs, rhs, operand):
+        self.lhs = lhs
+        self.rhs = rhs
+        self.operand = operand
+        # operands = {'gt', 'st', 'eq', 'ge', 'se'}
+
+    def infer(self, phi):
+        lhs = Hole(phi, self.lhs).infer()
+        rhs = Hole(phi, self.rhs).infer()
+        return Predicate(lhs, rhs, self.operand)
+
 
 
 class Insert:  # ins(j,{a_i:v_i...})
@@ -93,18 +105,19 @@ class Filter:  # filter(phi,Q)
 '============================================================================================' \
 '=========================================================================================='
 
+class PredicateHole:
+    def __init__(self, lhs, rhs, operand):
+        self.rhs = attr_infer(rhs)
+        self.lhs = attr_infer(lhs)
+        self.operand = operand
 
-class Hole:
-    def __init__(self, id, options):
-        self.id = id
-        self.options = options
+    def fill(self):
+        L = attr_infer(self.lhs)
+        R = attr_infer(self.rhs)
+        return Predicate(L,R, self.operand)
 
     def infer(self):
-        pass#!!!!!!!!!!!!!!!!!!!!!!!!1
-
-def attr_infer(phi, attr):
-    return phi[attr]
-
+        return self
 
 class InsertHole:  # ins(j,{a_i:v_i...})
     def __init__(self, phi, join_chain, values):
@@ -198,20 +211,6 @@ class FilterHole:  # filter(pred,Q)
     #
 
 
-
-class Predicate:
-    def __init__(self, lhs, rhs, operand):
-        self.lhs = lhs
-        self.rhs = rhs
-        self.operand = operand
-        # operands = {'gt', 'st', 'eq', 'ge', 'se'}
-
-    def infer(self, phi):
-        lhs = Hole(phi, self.lhs).infer()
-        rhs = Hole(phi, self.rhs).infer()
-        return Predicate(lhs, rhs, self.operand)
-
-    
 def joinChainToSql(join_chain):
     if len(join_chain)==0:
         return ''

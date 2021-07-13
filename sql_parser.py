@@ -29,9 +29,9 @@ elif parsed_query[0].value == 'DELETE':
 
 elif parsed_query[0].value == 'INSERT':
     jc = parsed_query[4].value.split()[0].strip()
-    attrs = [i.replace(',','').strip() for i in parsed_query[4].value.replace('(','').replace(')','').split()[1:]]
-    vals = [i.replace(',','').strip() for i in parsed_query[6].value.replace('(','').replace(')','').split()[1:]]
+    attrs = [i.replace(',','').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
+    vals = [i.replace(',','').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
     ins = {attrs[i]:vals[i] for i in range(len(vals))}
-    transaction = Insert(jc,ins)
+    transaction = Insert(jc, ins)
 elif parsed_query[0].value == 'SELECT':
     attrs = [i.strip() for i in parsed_query[2].value.split(',')]
