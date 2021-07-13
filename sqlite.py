@@ -67,14 +67,8 @@ VALUES
 """
 
 add_users = """
-INSERT INTO
-  MEMBER (mname, afk)
-VALUES
-  ('James', 1),
-  ('Leila', 5),
-  ('Brigitte', 3),
-  ('Mike', 2),
-  ('Elizabeth', 2);
+    DELETE FROM MEMBER WHERE mname = 'Elizabeth';
+
 """
 
 q = """
@@ -84,6 +78,54 @@ connection = create_connection("./test_app.sqlite")
 # execute_query(connection, create_users_table)  
 # execute_query(connection, ADDRESS)  
 # execute_query(connection, add_addr)  
-# execute_query(connection, add_users)  
+execute_query(connection, add_users)  
 d = execute_read_query(connection, q)
 print(d)
+
+class Sqlite:
+    def __init__(self):
+        self.db = self.create_connection('./db.sqlite')
+        self.db_prime = self.create_connection('./db_prime.sqlite')
+        # TODO create tables from schema
+
+
+    def create_connection(self, path):
+        connection = None
+        try:
+            connection = sqlite3.connect(path)
+            print("Connection to SQLite DB successful")
+        except Error as e:
+            print(f"The error '{e}' occurred")
+
+        return connection
+
+
+    def execute_query(self, query):
+        cursor = self.db.cursor()
+        try:
+            cursor.execute(query)
+            connection.commit()
+            print("Query executed successfully")
+        except Error as e:
+            print(f"The error '{e}' occurred")
+            
+        cursor = connection.cursor()
+        try:
+            cursor.execute(query)
+            connection.commit()
+            print("Query executed successfully")
+        except Error as e:
+            print(f"The error '{e}' occurred")
+
+
+    def execute_read_query(self,query):
+        cursor = connection.cursor()
+        result = None
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+        except Error as e:
+            print(f"The error '{e}' occurred")
+            
+        
