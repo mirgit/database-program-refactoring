@@ -71,12 +71,9 @@ add_users = """
 
 """
 
-# q = """
-#     SELECT address, city FROM MEMBER NATURAL JOIN ADDRESS  WHERE mname = 'Elizabeth';
-# """
+q = """SELECT address, city FROM MEMBER NATURAL JOIN ADDRESS  WHERE mname = 'Elizabeth';"""
 connection = create_connection("./test_app.sqlite")
-<<<<<<< HEAD
-# execute_query(connection, create_users_table)  
+# execute_query(connection, create_users_table)
 # execute_query(connection, ADDRESS)  
 # execute_query(connection, add_addr)  
 execute_query(connection, add_users)  
@@ -130,7 +127,6 @@ class Sqlite:
             print(f"The error '{e}' occurred")
             
         
-=======
 # execute_query(connection, create_users_table)
 # execute_query(connection, ADDRESS)
 # execute_query(connection, add_addr)
@@ -266,4 +262,3 @@ if len(d)>0:
 #                 # [print(i.ttype, i) for i in a]
 #                     print(i, a[2])
 '''
->>>>>>> e3f444e63f6fe7268515c712318728af7611d8a4
