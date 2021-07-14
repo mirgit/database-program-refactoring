@@ -8,7 +8,13 @@ class Schema:
 
     def __str__(self):
         return "".format("SchemaDef(%s)", self.tables)
-        
+
+    def get_table(self,table_name):
+        for t in self.tables:
+            if t.name == table_name:
+                return t
+        return "".format("SchemaDef(%s)", self.tables)
+
     def name_to_id(self, a):  # if not exist...!!!!!!!!
         return self.attr2id[a]
 
@@ -20,6 +26,6 @@ class Schema:
 
     def size(self):
         return len(self.attr2id)
-    
+
     def add_table(self, table):
         self.tables.append(table)

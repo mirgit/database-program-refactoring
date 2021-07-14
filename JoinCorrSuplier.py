@@ -5,8 +5,8 @@ class JoinCorrSupplier:
         self.srcSchema = srcSchema 
         self.tgtSchema = tgtSchema 
         assert self.srcSchema is not None and self.tgtSchema is not None 
-        tableToVertices = {} 
-        tableToComponents = {} 
+        self.tableToVertices = {}
+        self.tableToComponents = {}
         self.buildTargetSchemaGraph() 
         
         
@@ -14,7 +14,7 @@ class JoinCorrSupplier:
         # vertex data: table name, edge data: foreign key
         graph = Graph()
         # create a vertex for each table
-        for table in self.tgtSchema.tables.values():
+        for table in self.tgtSchema.tables:#.values():
             tableName = table.name 
             vertex = graph.addVertex(tableName) 
             self.tableToVertices[tableName] = vertex 

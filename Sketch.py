@@ -2,7 +2,8 @@ import subprocess
 
 from z3 import *
 
-class Sketch:
+class Sketch:#sql-parser + valcorr -> transactions.genSketch(phi,..) -> self.solve -> trans.fill:program -> get string?
+
     def __init__(self, program, phi):
         self.program = program  # dict of func_name:list of query/update objects
         self.sketch = None
@@ -21,8 +22,11 @@ class Sketch:
 
     def encodeSketch(self):
         parameters = []
+        i = 0
         for hole in self.holes:
-            parameters.append(BoolVector(hole.id, len(hole.options)))
+
+            parameters.append(BoolVector(i, len(hole.options)))
+            i += 1
         self.solver = Solver()
         for x in parameters:
             self.solver.add(Sum([If(i, 1, 0) for i in x]) == 1)
@@ -36,7 +40,7 @@ class Sketch:
                 if model[par]:
                     negation.append(par)
                     holeID,opt = par.split('__')
-                    self.holes_value[holeID] = self.holes[holeID][opt]
+                    self.holes_value[holeID] = self.holes[int(holeID)][int(opt)]
             self.solver.add(Not(negation))
             return model
 
