@@ -75,7 +75,7 @@ add_users = """
 #     SELECT address, city FROM MEMBER NATURAL JOIN ADDRESS  WHERE mname = 'Elizabeth';
 # """
 connection = create_connection("./test_app.sqlite")
-<<<<<<< HEAD
+
 # execute_query(connection, create_users_table)  
 # execute_query(connection, ADDRESS)  
 # execute_query(connection, add_addr)  
@@ -84,9 +84,8 @@ d = execute_read_query(connection, q)
 print(d)
 
 class Sqlite:
-    def __init__(self):
-        self.db = self.create_connection('./db.sqlite')
-        self.db_prime = self.create_connection('./db_prime.sqlite')
+    def __init__(self, db_name):
+        self.db = self.create_connection(db_name)
         # TODO create tables from schema
 
 
@@ -130,7 +129,6 @@ class Sqlite:
             print(f"The error '{e}' occurred")
             
         
-=======
 # execute_query(connection, create_users_table)
 # execute_query(connection, ADDRESS)
 # execute_query(connection, add_addr)
@@ -266,4 +264,3 @@ if len(d)>0:
 #                 # [print(i.ttype, i) for i in a]
 #                     print(i, a[2])
 '''
->>>>>>> e3f444e63f6fe7268515c712318728af7611d8a4
