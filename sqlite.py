@@ -81,9 +81,8 @@ d = execute_read_query(connection, q)
 print(d)
 
 class Sqlite:
-    def __init__(self):
-        self.db = self.create_connection('./db.sqlite')
-        self.db_prime = self.create_connection('./db_prime.sqlite')
+    def __init__(self, db_name):
+        self.db = self.create_connection(db_name)
         # TODO create tables from schema
 
 
@@ -126,7 +125,7 @@ class Sqlite:
         except Error as e:
             print(f"The error '{e}' occurred")
             
-        
+
 # execute_query(connection, create_users_table)
 # execute_query(connection, ADDRESS)
 # execute_query(connection, add_addr)
