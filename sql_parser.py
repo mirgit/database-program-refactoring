@@ -4,7 +4,7 @@ from ValueCorrespondance import ValCorrGenerator
 # from Schema import Schema
 from JoinCorrSuplier import JoinCorrSupplier
 from Schema_provider import SchemaProvider
-
+from z3 import *
 
 # ********test*********
 
@@ -17,6 +17,7 @@ src_schema,tgt_schema = [S.src_schema,S.tgt_schema]
 # S1 = Schema(oldSchema)
 # S2 = Schema(newSchema)
 phi = ValCorrGenerator(src_schema, tgt_schema)
+phi = phi.get_solution()
 join_supplier = JoinCorrSupplier(src_schema,tgt_schema)
 q = 'SELECT A.i, B.i FROM A JOIN B ON A.a = B.b WHERE A.c = 5'
 u = 'SELECT CustomerID FROM Customer WHERE Name = <name>;'
@@ -46,13 +47,39 @@ elif parsed_query[0].value == 'DELETE':
     transaction = Delete(jc, jc, Predicate(l, r, op))
 
 elif parsed_query[0].value == 'INSERT':
-    jc = parsed_query[4].value.split()[0].strip()
-    jc = [src_schema.get_table(t) for t in jc.split(',')]
+    tName = parsed_query[4].value.split()[0].strip()
+    jc = [src_schema.get_table(t) for t in tName.split(',')]
     attrs = [i.replace(',', '').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
     vals = [i.replace(',', '').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
-    ins = {attrs[i]: vals[i] for i in range(len(vals))}
+    ins = {tName+'.'+attrs[i]: vals[i] for i in range(len(vals))}
     transaction = Insert(jc, ins)
     # transaction.to_sql()
-    transaction.genSketch(phi, join_supplier)
+    holes = transaction.genSketch(phi, join_supplier)
+    parameters = []
+    i = 0
+    solver = Solver()
+    for hole in holes:
+        parameters.append(BoolVector(i, len(hole)))
+        i += 1
+    for x in parameters:
+        solver.add(Sum([If(i, 1, 0) for i in x]) == 1)
+    holes_value = {}
+    if solver.check() == sat:
+        model = solver.model()
+        negation = []
+        for par in model.decls():
+            if model[par]:
+                negation.append(model[par])
+                holeID, opt = par.name().split('__')
+                holes_value[holeID] = holes[int(holeID)][int(opt)]
+        solver.add(Not(And(negation)))
+        solution = []
+        for i in range(len(holes)):
+            solution.append(holes_value[str(i)])
+
+    print(solution)
+    transaction.fill(solution)
+    print(transaction.to_sql())
+
 elif parsed_query[0].value == 'SELECT':
     attrs = [i.strip() for i in parsed_query[2].value.split(',')]

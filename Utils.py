@@ -10,19 +10,20 @@ class JoinChain:
 
     def genSketch(self, phi, supplier):
         self.holes = supplier.getJoinChains(phi, self.chain)
-        return self.holes, self
+        return self.holes
 
     def fill(self, holes_value):
         self.chosen_join_corr = holes_value[0]
         return self
 
     def to_sql(self):
-        sql = self.chosen_join_corr[0][0]
+        print(self.chosen_join_corr)
+        sql = self.chosen_join_corr[0][0].name
         if len(self.chosen_join_corr) > 1:
             self.chosen_join_corr.pop(0)
             for tup in self.chosen_join_corr:
-                A = tup[0]
-                p1,p2 = tup[1]
+                A = tup[0].name
+                p1, p2 = tup[1]
                 sql = sql + ' JOIN '+A+' ON '+p1+' = '+p2
         return sql
 

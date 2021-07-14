@@ -46,12 +46,10 @@ class JoinCorrSupplier:
             
     def getJoinChainsForColumns(self, valueCorr, chain, columns):
         tableNames = self.tablesMappedTo(valueCorr, columns)
-        if (tableNames.size() == 1):
-            return [t for t in self.tgtSchema.tables if t.name in tableNames]
+        if (len(tableNames) == 1):
+            return [[(t, None) for t in self.tgtSchema.tables if t.name in tableNames]]
         else:
             return self.getJoinChainsForTables(tableNames)
-        
-        
 
     def getJoinChainsForTables(self, tableNames):
         component = self.tableToComponents[tableNames[0]]
@@ -76,5 +74,6 @@ class JoinCorrSupplier:
         tables = set()
         for col in columns:
             corr_col = value_corr[col]
-            tables.add(corr_col[:corr_col.index('.')])
+            for col2 in corr_col:
+                tables.add(col2[:col2.index('.')])
         return list(tables)

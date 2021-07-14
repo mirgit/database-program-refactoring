@@ -4,8 +4,8 @@ from Schema import Schema
 
 from Table import Table
 
-# src = './benchmark/bench1/src-schema.txt'
-# tgt = './benchmark/bench1/tgt-schema.txt'
+# src = './benchmarkss/bench1/src-schema.txt'
+# tgt = './benchmarkss/bench1/tgt-schema.txt'
 
 
 class SchemaProvider:
@@ -19,7 +19,7 @@ class SchemaProvider:
         with open(src_schema_file, "r") as f:
             file = f.read()
         src_queries = file.split(';')[:-1]
-        schema,tables = self.create_tables(src_queries)#, self.src_db)#, self.src_schema)
+        schema, tables = self.create_tables(src_queries)#, self.src_db)#, self.src_schema)
         self.src_schema = Schema(schema,tables)
 
         with open(tgt_schema_file, "r") as f:
@@ -35,7 +35,6 @@ class SchemaProvider:
         #
         # text_file.close()
         # self.create_tables(tgt_queries, self.tgt_db, self.tgt_schema)
-
         
     def create_tables(self, table_queries):#, db, schema):
         schema = {}
@@ -75,8 +74,8 @@ class SchemaProvider:
             elif line.find('PRIMARY KEY') != -1:
                 PK = line.split('(')[1][:-1]
             else:
-                n,t = [i.strip() for i in line.split()]
-                cols.append((n,t))
+                n, t = [i.strip() for i in line.split()]
+                cols.append((Tname + "." + n, t))
         info['name'] = Tname
         info['columns'] = cols
         info['primaryKey'] = PK

@@ -60,11 +60,11 @@ class Graph:
         return subGraphs
     
     # DFS function
-    def dfs(self, x, temp) :
-        self.visited[x[0]] = True;
+    def dfs(self, x, temp):
+        self.visited[x[0]] = True
         temp.append(x)
-        for i in x[0].adj_vertices :
-            if i[0] in self.vertices and not self.visited[i[0]] :
+        for i in x[0].adj_vertices:
+            if i[0] in self.vertices and not self.visited[i[0]]:
                 temp = self.dfs(i, temp)
         return temp
 
@@ -81,7 +81,7 @@ class Graph:
     def getSpaning(self):
         if self.vertex_count<0:
             return []
-        spanning = self.dfs((self.vertices[0], None),[])
+        spanning = self.dfs((self.vertices[0], None), [])
         for i in self.visited :
             if (not self.visited[i]) :
                 return []

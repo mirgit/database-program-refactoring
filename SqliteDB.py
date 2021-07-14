@@ -17,7 +17,6 @@ class SqliteDB:
 
         return connection
 
-
     def execute_query(self, query):
         cursor = self.db.cursor()
         try:
@@ -35,8 +34,7 @@ class SqliteDB:
         except Error as e:
             print(f"The error '{e}' occurred")
 
-
-    def execute_read_query(self,query):
+    def execute_read_query(self, query):
         cursor = self.db.cursor()
         result = None
         try:
@@ -45,5 +43,9 @@ class SqliteDB:
             return result
         except Error as e:
             print(f"The error '{e}' occurred")
-            
-        
+
+    def create_tables(self,file_name):
+        with open(file_name, 'r') as f:
+            batch = f.read()
+        for query in batch.split(';')[:-1]:
+            self.execute_read_query(query+';')

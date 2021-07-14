@@ -11,7 +11,7 @@ class Sketch:#sql-parser + valcorr -> transactions.genSketch(phi,..) -> self.sol
         self.phi = phi
         self.holes_value = {}
         self.generatedProgram = {}
-        self.solver = None
+        self.solver = Solver()
 
     def generateSketch(self):
         for m in self.program:
@@ -27,7 +27,6 @@ class Sketch:#sql-parser + valcorr -> transactions.genSketch(phi,..) -> self.sol
 
             parameters.append(BoolVector(i, len(hole.options)))
             i += 1
-        self.solver = Solver()
         for x in parameters:
             self.solver.add(Sum([If(i, 1, 0) for i in x]) == 1)
 

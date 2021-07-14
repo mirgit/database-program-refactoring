@@ -17,46 +17,50 @@ def fill_val(phi, attr):
     return phi[attr]
 
 
-def attr_infer(phi, attr):
-    # holes = []
-    #     holes.append(Hole(id,))
-    return phi[attr]
+# def attr_infer(phi, attr):
+#     # holes = []
+#     #     holes.append(Hole(id,))
+#     return phi[attr]
 
 class Insert:  # ins(j,{a_i:v_i...})
     def __init__(self, join_chain, values):
-        self.join_chain = JoinChain(join_chain)
+        if isinstance(join_chain, JoinChain):
+            self.join_chain = join_chain
+        else:
+            self.join_chain = JoinChain(join_chain)
         self.values = values
         self.holes = []
-        self.sk_join_chain = None
-        # self.sk_values = None
-        self.holes_id = 0
+        self.tgt_transaction = None
+        # self.chosen_join_chain = None
+        # self.chosen_values = None
+        # self.holes_id = 0
     # def Holer(self):
     #     return InsertHole(self.join_chain,self.values)
 
     def genSketch(self, phi, join_corr_supplier):
-        self.holes= self.join_chain.genSketch(phi, join_corr_supplier)
-        # self.sk_values = {}
+        self.holes.append(self.join_chain.genSketch(phi, join_corr_supplier))
+        sk_values = {}
         for a in self.values:
-            self.holes.append(attr_infer(phi, a))
+            self.holes.append(phi[a])
             # self.sk_values[h.hid] = self.values[a]
-        return self.holes, self.holes_id+len(self.holes)
+        return self.holes #, self.holes_id+len(self.holes)
 
     def fill(self, holes_value):
-        J = self.sk_join_chain.fill(holes_value)
+        JC = self.join_chain.fill(holes_value)
         holes_value.pop(0)
         V = {}
         for v in self.values:
             V[holes_value[0]] = self.values[v]
             holes_value.pop(0)
-        return holes_value, Insert(J, V)
+        self.tgt_transaction = Insert(JC, V)
 
     def to_sql(self):
-        sql = 'INSERT INTO ' + self.join_chain.to_sql()
+        sql = 'INSERT INTO ' + self.tgt_transaction.join_chain.to_sql()
         cols = []
         vals = []
-        for c in self.values:
-            cols.append(c)
-            vals.append(self.values[c])
+        for c in self.tgt_transaction.values:
+            cols.append(c.split('.')[1])
+            vals.append(self.tgt_transaction.values[c])
         sql = sql + ' '+str(tuple(cols))+' VALUES '+str(tuple(vals))+';'
         return sql
 
