@@ -81,5 +81,5 @@ def sql_to_transaction(transaction):
         attrs = [i.strip() for i in parsed_query[2].value.split(',')]
         [print(i) for i in parsed_query]
 
-u = 'SELECT order_items.order_id, items.name, order_items.quantity FROM order_items JOIN items ON order_items.item_id = items.id WHERE order_items.id = <id>;'
-sql_to_transaction(u)
+# u = 'SELECT order_items.order_id, items.name, order_items.quantity FROM order_items JOIN items ON order_items.item_id = items.id WHERE order_items.id = <id>;'
+# sql_to_transaction(u)
