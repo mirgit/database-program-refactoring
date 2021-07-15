@@ -101,6 +101,7 @@ class Update:  # upd(j,pred,attr,val)
         table_name, attr = tgt_transaction.attr.split('.')
         sql = 'UPDATE ' + table_name + ' SET ' + attr + ' = ' + tgt_transaction.value +\
               ' ' + tgt_transaction.predicate.to_sql() + ' ;'
+        return sql
 
 
 #     UPDATE Employee SET PhoneNumber = <phone> WHERE EmployeeNumber = <eid>;
