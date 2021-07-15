@@ -37,7 +37,7 @@ class ValCorrGenerator:
         # soft: similar names: more score
         for i in range(1, size1+1):
             for j in range(1, size2+1):
-                similarity = 20 - levenshtein_distance(s1.id_to_name(i), s2.id_to_name(j))
+                similarity = 20 - levenshtein_distance(s1.id_to_name(i).split('.')[1], s2.id_to_name(j).split('.')[1])
                 self.cnf.add_soft(x[i][j], similarity)
         self.vars = x
         self.solution = {attr: [] for attr in self.S1.cols}  ##!!!!!!only queried attrs are needed

@@ -25,8 +25,8 @@ def sql_to_transaction(transaction):
         jc = parsed_query[2]
         attr, value = [i.strip() for i in parsed_query[6].value.split('=')]
         l, op, r = [i.strip() for i in parsed_query[8].value.replace(';', '').split()[1:4]]
-        transaction = Update(jc, Predicate(l, r, op), attr, value)
-        print(transaction)
+        transaction = Update(jc, (l, r, op), attr, value)
+        return transaction
         # while i < len(parsed_query):
         #     i, token = parsed_query.token_next(i)
         #
@@ -34,11 +34,11 @@ def sql_to_transaction(transaction):
     elif parsed_query[0].value == 'DELETE':
         jc = [parsed_query[4].value]
         l, op, r = [i.strip() for i in parsed_query[6].value.replace(';', '').split()[1:4]]
-        transaction = Delete(jc, jc, Predicate(l, r, op))
+        transaction = Delete(jc, (l, r, op))
+        return transaction
 
     elif parsed_query[0].value == 'INSERT':
         # phi = phi_generator.get_solution()
-
         tName = parsed_query[4].value.split()[0].strip()
         # jc = [src_schema.get_table(t) for t in tName.split(',')]
         jc = [t.strip() for t in tName.split(',')]
@@ -48,7 +48,7 @@ def sql_to_transaction(transaction):
                 parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
         ins = {tName + '.' + attrs[i]: vals[i] for i in range(len(vals))}
         transaction = Insert(jc, ins)
-        print(type(transaction))
+        return transaction
         # transaction.to_sql()
         # holes = transaction.genSketch(phi, join_supplier)
         # parameters = []
@@ -79,6 +79,7 @@ def sql_to_transaction(transaction):
 
     elif parsed_query[0].value == 'SELECT':
         attrs = [i.strip() for i in parsed_query[2].value.split(',')]
+        [print(i) for i in parsed_query]
 
-a = 'INSERT INTO A (id,name) VALUES (1,"Ali")'
-sql_to_transaction(a)
+u = 'SELECT order_items.order_id, items.name, order_items.quantity FROM order_items JOIN items ON order_items.item_id = items.id WHERE order_items.id = <id>;'
+sql_to_transaction(u)

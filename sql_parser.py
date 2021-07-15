@@ -8,8 +8,8 @@ from z3 import *
 
 # ********test*********
 
-src = './benchmarks/bench1/src-schema.txt'
-tgt = './benchmarks/bench1/tgt-schema.txt'
+src = './benchmarks/bench3/src-schema.txt'
+tgt = './benchmarks/bench3/tgt-schema.txt'
 S = SchemaProvider(src, tgt)
 src_schema,tgt_schema = [S.src_schema,S.tgt_schema]
 # oldSchema = {'A': {'B': 'int', 'C': 'int'}}
@@ -18,6 +18,7 @@ src_schema,tgt_schema = [S.src_schema,S.tgt_schema]
 # S2 = Schema(newSchema)
 phi = ValCorrGenerator(src_schema, tgt_schema)
 phi = phi.get_solution()
+print(phi)
 join_supplier = JoinCorrSupplier(src_schema,tgt_schema)
 q = 'SELECT A.i, B.i FROM A JOIN B ON A.a = B.b WHERE A.c = 5'
 u = 'SELECT CustomerID FROM Customer WHERE Name = <name>;'
@@ -27,6 +28,8 @@ u = 'SELECT order_items.order_id, items.name, order_items.quantity FROM order_it
 u = 'INSERT INTO A (B, C) VALUES (3, 4);'
 u = 'INSERT INTO ADDRESS (aid, address, city, state, zipcode) VALUES (FRESH(1), <addr>, <ct>, <st>, <zip>);'
 # u = 'DELETE FROM line_items WHERE line_items.id = <id>;'
+u = """INSERT INTO Employee (EmployeeNumber, Name, PhoneNumber, Picture, VoicePrint, RetinalPrint) VALUES (<eid>, <name>, <phone>, <pic>, <voice>, <retinal>);
+"""
 parsed_query = sqlparse.parse(u)[0]
 hq = sqlparse.parse(q)[0]
 # print(hu.tokens,'\n', hq.tokens)
@@ -48,10 +51,11 @@ elif parsed_query[0].value == 'DELETE':
 
 elif parsed_query[0].value == 'INSERT':
     tName = parsed_query[4].value.split()[0].strip()
-    jc = [src_schema.get_table(t) for t in tName.split(',')]
+    jc = [t.strip() for t in tName.split(',')]#src_schema.get_table(t)
     attrs = [i.replace(',', '').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
     vals = [i.replace(',', '').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
     ins = {tName+'.'+attrs[i]: vals[i] for i in range(len(vals))}
+    print(jc,ins)
     transaction = Insert(jc, ins)
     # transaction.to_sql()
     holes = transaction.genSketch(phi, join_supplier)
@@ -63,16 +67,18 @@ elif parsed_query[0].value == 'INSERT':
         i += 1
     for x in parameters:
         solver.add(Sum([If(i, 1, 0) for i in x]) == 1)
-    holes_value = {}
-    if solver.check() == sat:
-        model = solver.model()
-        negation = []
-        for par in model.decls():
-            if model[par]:
-                negation.append(model[par])
-                holeID, opt = par.name().split('__')
-                holes_value[holeID] = holes[int(holeID)][int(opt)]
-        solver.add(Not(And(negation)))
+    time = 3
+    for times in range(time):
+        if solver.check() == sat:
+            holes_value = {}
+            model = solver.model()
+            negation = []
+            for par in model.decls():
+                if model[par]:
+                    negation.append(model[par])
+                    holeID, opt = par.name().split('__')
+                    holes_value[holeID] = holes[int(holeID)][int(opt)]
+            solver.add(Not(And(negation)))
         solution = []
         for i in range(len(holes)):
             solution.append(holes_value[str(i)])
