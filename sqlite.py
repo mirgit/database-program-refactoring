@@ -71,14 +71,24 @@ add_users = """
 
 """
 
-q = """SELECT address, city FROM MEMBER NATURAL JOIN ADDRESS  WHERE mname = 'Elizabeth';"""
+q = """SELECT address, city FROM  ADDRESS  ;"""
+q2 = """SELECT address FROM ADDRESS  ;"""
+
+# q = """UPDATE Employee SET PhoneNumber = 4 WHERE EmployeeNumber = 3;"""
 connection = create_connection("./test_app.sqlite")
-# execute_query(connection, create_users_table)
-# execute_query(connection, ADDRESS)  
-# execute_query(connection, add_addr)  
-execute_query(connection, add_users)  
+execute_query(connection, create_users_table)
+execute_query(connection, ADDRESS)
+execute_query(connection, add_addr)
+# execute_query(connection, q)
 d = execute_read_query(connection, q)
+d2 = execute_read_query(connection, q)
 print(d)
+for i in d:
+    if i in d2:
+        print("check")
+    else:
+        print("booooooooooooooooo")
+
 
 # class Sqlite:
 #     def __init__(self, db_name):
@@ -126,10 +136,10 @@ print(d)
 #             print(f"The error '{e}' occurred")
 #
 #
-# # execute_query(connection, create_users_table)
-# # execute_query(connection, ADDRESS)
-# # execute_query(connection, add_addr)
-# # execute_query(connection, add_users)
+# execute_query(connection, create_users_table)
+# execute_query(connection, ADDRESS)
+# execute_query(connection, add_addr)
+# execute_query(connection, add_users)
 #
 # def create_tables(connection,file_name):
 #     with open(file_name,'r') as f:
