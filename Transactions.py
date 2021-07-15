@@ -102,14 +102,14 @@ class Update:  # upd(j,pred,attr,val)
         self.tgt_transaction = Update(JC, P, attr, self.value)
 
     def to_sql(self):
-        pass
-    # def run(self, database):
-    #     for table in self.join_chain:
-    #         database[table].update(self.predicate,self.attr,self.values)
-    #
-    # def Holer(self):
-    #     return UpdateHole(self.join_chain,self.predicate,self.attr,self.values)
+        tgt_transaction = self.tgt_transaction
+        table_name, attr = tgt_transaction.attr.split('.')
+        sql = 'UPDATE ' + table_name + ' SET ' + attr + ' = ' + tgt_transaction.value +\
+              ' ' + tgt_transaction.predicate.to_sql() + ' ;'
+        return sql
 
+
+#     UPDATE Employee SET PhoneNumber = <phone> WHERE EmployeeNumber = <eid>;
 
 class Delete:  # del(tables,j,phi)
     def __init__(self, tablelist, predicate):
@@ -340,6 +340,3 @@ class Select:  # proj(attrs, Q(j))
 #     #     pred = self.predicate.infer()
 #     #     query = self.query.infer()
 #     #     return Filter(pred, query)
-
-
-        
