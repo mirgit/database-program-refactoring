@@ -28,6 +28,7 @@ class Predicate:
         return self
 
     def to_sql(self):
+
         sql = 'WHERE ' + self.tgt_lhs+' '+self.operand+' ' + self.tgt_rhs
         return sql
 
@@ -47,14 +48,13 @@ class JoinChain:
         return self
 
     def to_sql(self):
-        print(self.chosen_join_corr)
+        # print(self.chosen_join_corr)
         sql = self.chosen_join_corr[0][0].name
-        if len(self.chosen_join_corr) > 1:
-            self.chosen_join_corr.pop(0)
-            for tup in self.chosen_join_corr:
-                tab = tup[0].name
-                p1, p2 = tup[1]
-                sql = sql + ' JOIN ' + tab + ' ON ' + p1 + ' = ' + p2
+        for i in range(1,len(self.chosen_join_corr)):
+            tup = self.chosen_join_corr[i]
+            tab = tup[0].name
+            p1, p2 = tup[1]
+            sql = sql + ' JOIN ' + tab + ' ON ' + p1 + ' = ' + p2
         return sql
 
     # def joinChainToSql(self, join_chain):

@@ -64,13 +64,13 @@ class SchemaProvider:
         cols = []
         for line in q:
             if line.find('FOREIGN KEY') != -1:
-                line = line.replace('FOREIGN KEY','')
-                line = line.replace('REFERENCES ','')
+                line = line.replace('FOREIGN KEY', '')
+                line = line.replace('REFERENCES ', '')
                 line = line.split('(')
                 thisKey = line[1].split(')')[0].strip()
                 Fname = line[1].split(')')[1].strip()
                 Fkey = line[2][:-1].strip()
-                FK[(Tname,thisKey)] =(Fname,Fkey)
+                FK[(Tname, Tname+'.'+thisKey)] = (Fname, Fname+'.'+Fkey)
             elif line.find('PRIMARY KEY') != -1:
                 PK = line.split('(')[1][:-1]
             else:

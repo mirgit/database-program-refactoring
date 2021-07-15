@@ -35,8 +35,7 @@ class Graph:
             self.vertex_count += 1
             self.visited[vertex] = False
         return vertex
-    
-    
+
     def addEdge(self, v, w, fk):
         edge = Edge(v, w, fk)
         v.adj_vertices.append((w, edge))
