@@ -66,8 +66,6 @@ class Insert:  # ins(j,{a_i:v_i...})
         return sql
 
 
-
-
 class Update:  # upd(j,pred,attr,val)
     def __init__(self, join_chain, predicate, attr, values):
         self.join_chain = join_chain
@@ -102,7 +100,7 @@ class Delete:  # del(tables,j,phi)
         tables = [join_corr_supplier.src_schema.get_table(t) for t in self.join_chain]
         self.join_chain = JoinChain(tables)
         self.holes.append(self.join_chain.genSketch(phi, join_corr_supplier))
-        self.holes.append(self.predicate.genSketch(phi))
+        self.holes += self.predicate.genSketch(phi)
         return self.holes
 
     def fill(self, holes_value):
@@ -112,7 +110,10 @@ class Delete:  # del(tables,j,phi)
         self.tgt_transaction = Select(T,P)
 
     def to_sql(self):
-        pass
+        tgt = self.tgt_transaction
+        tgt_join_chain = tgt.join_chain
+        tgt_predicate = tgt.predicate
+        tgt_attrs = tgt.attrs
         # for j in self.join_chain.
     #     DELETE FROM cache WHERE id IN (SELECT cache.id FROM cache JOIN main ON cache.id=main.fid WHERE main.val = 0);
     # def run(self, database):
@@ -138,7 +139,7 @@ class Select:  # proj(attrs, Q(j))
         self.holes.append(self.join_chain.genSketch(phi, join_corr_supplier))
         for a in self.attrs:
             self.holes.append(phi[a])
-        self.holes.append(self.predicate.genSketch(phi))  #TODO append or add?
+        self.holes += self.predicate.genSketch(phi)
         return self.holes
 
     def fill(self, holes_value):
