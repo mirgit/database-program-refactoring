@@ -30,6 +30,9 @@ u = 'INSERT INTO ADDRESS (aid, address, city, state, zipcode) VALUES (FRESH(1), 
 # u = 'DELETE FROM line_items WHERE line_items.id = <id>;'
 u = """INSERT INTO Employee (EmployeeNumber, Name, PhoneNumber, Picture, VoicePrint, RetinalPrint) VALUES (<eid>, <name>, <phone>, <pic>, <voice>, <retinal>);
 """
+u = 'DELETE FROM Employee WHERE VoicePrint = <eid>;'
+u = u.replace('<', '__')
+u = u.replace('>', '__')
 parsed_query = sqlparse.parse(u)[0]
 hq = sqlparse.parse(q)[0]
 # print(hu.tokens,'\n', hq.tokens)
@@ -47,17 +50,12 @@ if parsed_query[0].value == 'UPDATE':
 elif parsed_query[0].value == 'DELETE':
     jc = [parsed_query[4].value]
     l, op, r = [i.strip() for i in parsed_query[6].value.replace(';', '').split()[1:4]]
-    transaction = Delete(jc, jc, Predicate(l, r, op))
+    l = jc[0] + '.' + l if l.find('.') == -1 and l[0:2] != '__'else l
+    r = jc[0] + '.' + r if r.find('.') == -1 and r[0:2] != '__'else r
+    print(l,r,jc)
+    transaction = Delete(jc, Predicate(l, op, r))
 
-elif parsed_query[0].value == 'INSERT':
-    tName = parsed_query[4].value.split()[0].strip()
-    jc = [t.strip() for t in tName.split(',')]#src_schema.get_table(t)
-    attrs = [i.replace(',', '').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
-    vals = [i.replace(',', '').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
-    ins = {tName+'.'+attrs[i]: vals[i] for i in range(len(vals))}
-    print(jc,ins)
-    transaction = Insert(jc, ins)
-    # transaction.to_sql()
+
     holes = transaction.genSketch(phi, join_supplier)
     parameters = []
     i = 0
@@ -85,7 +83,52 @@ elif parsed_query[0].value == 'INSERT':
 
     print(solution)
     transaction.fill(solution)
-    print(transaction.to_sql())
+    k = transaction.to_sql()
+    while k.find('__') != -1:
+        k = k.replace('__', '<', 1)
+        k = k.replace('__', '>', 1)
+    print(k)
+elif parsed_query[0].value == 'INSERT':
+    tName = parsed_query[4].value.split()[0].strip()
+    jc = [t.strip() for t in tName.split(',')]#src_schema.get_table(t)
+    attrs = [i.replace(',', '').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
+    vals = [i.replace(',', '').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
+    ins = {tName+'.'+attrs[i]: vals[i] for i in range(len(vals))}
+    print(jc,ins)
+    transaction = Insert(jc, ins)
+    # transaction.to_sql()
+    holes = transaction.genSketch(phi, join_supplier)
+    parameters = []
+    i = 0
+    solver = Solver()
+    for hole in holes:
+        parameters.append(BoolVector(i, len(hole)))
+        i += 1
+    for x in parameters:
+        solver.add(Sum([If(i, 1, 0) for i in x]) == 1)
+        # DELETE FROM Employee WHERE EmployeeNumber IN ( SELECT EmployeeNumber FROM Employee WHERE Employee.EmployeeNumber = <eid> );
+    time = 3
+    for times in range(time):
+        if solver.check() == sat:
+            holes_value = {}
+            model = solver.model()
+            negation = []
+            for par in model.decls():
+                if model[par]:
+                    negation.append(model[par])
+                    holeID, opt = par.name().split('__')
+                    holes_value[holeID] = holes[int(holeID)][int(opt)]
+            solver.add(Not(And(negation)))
+        solution = []
+        for i in range(len(holes)):
+            solution.append(holes_value[str(i)])
+
+    print(solution)
+    transaction.fill(solution)
+
+    k =transaction.to_sql()
 
 elif parsed_query[0].value == 'SELECT':
     attrs = [i.strip() for i in parsed_query[2].value.split(',')]
+
+

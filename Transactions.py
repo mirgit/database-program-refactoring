@@ -67,16 +67,35 @@ class Insert:  # ins(j,{a_i:v_i...})
 
 
 class Update:  # upd(j,pred,attr,val)
-    def __init__(self, join_chain, predicate, attr, values):
+
+    def __init__(self, join_chain, predicate, attr, value):
         self.join_chain = join_chain
-        l,p,r = predicate
-        self.predicate = Predicate(l,p,r)
+        self.predicate = predicate
         self.attr = attr
-        self.values = values
+        self.value = value
+
+        self.tgt_transaction = None
+        self.holes = []
+
     def genSketch(self, phi, join_corr_supplier):
-        pass
+        tables = [join_corr_supplier.srcSchema.get_table(t) for t in self.join_chain]
+        self.join_chain = JoinChain(tables)
+        self.holes.append(self.join_chain.genSketch(phi, join_corr_supplier))
+        self.holes.append(phi[self.attr])
+        if self.predicate is not None:
+            self.holes += self.predicate.genSketch(phi)
+        # self.sk_values[h.hid] = self.values[a]
+        return self.holes
+
     def fill(self, holes_value):
-        pass
+        JC = self.join_chain.fill(holes_value)
+        holes_value.pop(0)
+        attr = holes_value[0]
+        holes_value.pop(0)
+        P = self.predicate.fill(holes_value) if self.predicate is not None else None
+        
+        self.tgt_transaction = Update(JC, P, attr, self.value)
+
     def to_sql(self):
         pass
     # def run(self, database):
@@ -90,38 +109,45 @@ class Update:  # upd(j,pred,attr,val)
 class Delete:  # del(tables,j,phi)
     def __init__(self, tablelist, predicate):
         self.tablelist = tablelist
-        self.join_chain = None
-        l,p,r = predicate
-        self.predicate = Predicate(l,p,r)
+        self.join_chain = tablelist
+        # l,p,r = predicate
+        self.predicate = predicate  # (l,p,r)
         self.holes = []
         self.tgt_transaction = None
 
     def genSketch(self, phi, join_corr_supplier):
-        tables = [join_corr_supplier.src_schema.get_table(t) for t in self.join_chain]
+        tables = [join_corr_supplier.srcSchema.get_table(t) for t in self.join_chain]
         self.join_chain = JoinChain(tables)
         self.holes.append(self.join_chain.genSketch(phi, join_corr_supplier))
-        self.holes += self.predicate.genSketch(phi)
+        if self.predicate is not None:
+            self.holes += self.predicate.genSketch(phi)
         return self.holes
 
     def fill(self, holes_value):
         T = self.join_chain.fill(holes_value)
-        P = self.predicate.fill(holes_value)
+        holes_value.pop(0)
+        P = self.predicate.fill(holes_value) if self.predicate is not None else None
+
         # l = P.tgt_lhs.spli
-        self.tgt_transaction = Select(T,P)
+        self.tgt_transaction = Delete(T, P)
+        # self.to_sql()
 
     def to_sql(self):
         tgt = self.tgt_transaction
-        tgt_join_chain = tgt.join_chain
-        tgt_predicate = tgt.predicate
-        tgt_attrs = tgt.attrs
-        # for j in self.join_chain.
-    #     DELETE FROM cache WHERE id IN (SELECT cache.id FROM cache JOIN main ON cache.id=main.fid WHERE main.val = 0);
-    # def run(self, database):
-    #     for table in self.tablelist:
-    #         database[table].delete()
-    #
-    # def Holer(self):
-    #     return DeleteHole(self.tablelist,self.join_chain,self.predicate)
+        tgt_join_chain = tgt.join_chain    # [(tname, None), (t2name, (id, fk)), ...]
+        tgt_predicate_str = tgt.predicate.to_sql() if tgt.predicate is not None else ''
+        chain_str = tgt_join_chain.to_sql()
+        queries = ''
+        if len(tgt_join_chain.chosen_join_corr) == 1:
+            query = 'DELETE FROM ' + tgt_join_chain.chosen_join_corr[0][0].name + ' ' + tgt_predicate_str + ';'
+            return query
+
+        for chain in tgt_join_chain.chosen_join_corr:
+            query = 'DELETE FROM ' + chain[0].name + ' WHERE ' + chain[0].primaryKey + \
+                    ' IN ( SELECT ' + chain[0].primaryKey + ' FROM ' + chain_str + ' '+\
+                    tgt_predicate_str + ' ); \n'
+            queries += query
+        return queries
 
 
 class Select:  # proj(attrs, Q(j))
@@ -139,7 +165,9 @@ class Select:  # proj(attrs, Q(j))
         self.holes.append(self.join_chain.genSketch(phi, join_corr_supplier))
         for a in self.attrs:
             self.holes.append(phi[a])
-        self.holes += self.predicate.genSketch(phi)
+        
+        if self.predicate is not None:
+            self.holes += self.predicate.genSketch(phi)
         return self.holes
 
     def fill(self, holes_value):
@@ -148,7 +176,7 @@ class Select:  # proj(attrs, Q(j))
         for attr in self.attrs:
             attrs[holes_value[0]] = self.attrs[attr]
             holes_value.pop(0)
-        P = self.predicate.fill(holes_value)
+        P = self.predicate.fill(holes_value) if self.predicate is not None else None
         self.tgt_transaction = Select(attrs, T, P)
 
     def to_sql(self):
@@ -159,7 +187,9 @@ class Select:  # proj(attrs, Q(j))
         sql += sql + ' ' + str(tuple(cols))
         sql += ' FROM ' + self.tgt_transaction.join_chain.to_sql()
         if self.predicate is not None:
-            sql += ' WHERE ' + self.predicate.to_sql()
+            sql += ' ' + self.predicate.to_sql()
+        sql += ' ;'
+        return sql
 
     # def run(self, database):
     #     pass

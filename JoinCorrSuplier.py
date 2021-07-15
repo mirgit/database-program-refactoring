@@ -81,8 +81,7 @@ class JoinCorrSupplier:
             if len(joinChain) > 0:
                 ret.add(tuple(joinChain))
         return list(map(list, ret))
-    
-    
+
     def tablesMappedTo(self, value_corr, columns):
         tables = set()
         for col in columns:
