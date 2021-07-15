@@ -15,6 +15,8 @@ def parse_program(program_file):
         name, params = k.split('(')
         params = params[:-1]
         params = params.split(',')
+        trans = trans.replace('<','__')
+        trans = trans.replace('>','__')
         program[name] = ({i.strip().split(' ')[1]: i.strip().split(' ')[0] for i in params}, trans)
     return program
 
@@ -22,19 +24,22 @@ def parse_program(program_file):
 def sql_to_transaction(transaction):
     parsed_query = sqlparse.parse(transaction)[0]
     if parsed_query[0].value == 'UPDATE':
-        jc = parsed_query[2]
+        jc = [parsed_query[2].value]
         attr, value = [i.strip() for i in parsed_query[6].value.split('=')]
         l, op, r = [i.strip() for i in parsed_query[8].value.replace(';', '').split()[1:4]]
-        transaction = Update(jc, (l, r, op), attr, value)
+        transaction = Update(jc, Predicate(l, op, r), attr, value)
         return transaction
         # while i < len(parsed_query):
         #     i, token = parsed_query.token_next(i)
         #
         # print(parsed_query.token_next(0))
     elif parsed_query[0].value == 'DELETE':
+        # print([ for t in parsed_query.tokens[0])
         jc = [parsed_query[4].value]
         l, op, r = [i.strip() for i in parsed_query[6].value.replace(';', '').split()[1:4]]
-        transaction = Delete(jc, (l, r, op))
+        l = jc[0] + '.' + l if l.find('.') == -1 and l[0:2] != '__' else l
+        r = jc[0] + '.' + r if r.find('.') == -1 and r[0:2] != '__' else r
+        transaction = Delete(jc, Predicate(l, op, r))
         return transaction
 
     elif parsed_query[0].value == 'INSERT':
@@ -78,8 +83,22 @@ def sql_to_transaction(transaction):
         # print(transaction.to_sql())
 
     elif parsed_query[0].value == 'SELECT':
+        # print([i.value for i in parsed_query.tokens])
         attrs = [i.strip() for i in parsed_query[2].value.split(',')]
-        [print(i) for i in parsed_query]
+        qu = [i.value for i in parsed_query.tokens]
+        from_index = qu.index('FROM')
+        # to_inex =
+        jc = []
+        # while from_index < len(qu)-2:
+        jc.append(qu[from_index + 2])
+        if qu[from_index+4]=='JOIN':
+            jc.append(qu[from_index + 6])
+        # from_index += 12
+
+        l, op, r = [i.strip() for i in parsed_query[-1].value.replace(';', '').split()[1:4]]
+        # print(attrs, jc, (l, op, r))
+        transaction = Select(attrs, jc, Predicate(l, op, r))
+        return transaction
 
 # u = 'SELECT order_items.order_id, items.name, order_items.quantity FROM order_items JOIN items ON order_items.item_id = items.id WHERE order_items.id = <id>;'
 # sql_to_transaction(u)
