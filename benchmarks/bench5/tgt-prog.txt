@@ -1,0 +1,25 @@
+update createCustomer(int cid, String name, int aid, int balance) {
+INSERT INTO Account JOIN Customer ON Account.CustomerID_fk = Customer.CustomerID (FirstName, CustomerID, Balance) VALUES (<name>, <cid>, <balance>);
+  INSERT INTO Account (AccountID, CustomerID_fk) VALUES (<aid>, <cid>);}
+
+update deleteCustomer(int cid) {
+DELETE FROM Account WHERE Account.CustomerID_fk = <cid>;
+  DELETE FROM Account WHERE AccountID IN ( SELECT AccountID FROM Account JOIN Customer ON Account.CustomerID_fk = Customer.CustomerID WHERE Customer.CustomerID = <cid> ); 
+DELETE FROM Customer WHERE CustomerID IN ( SELECT CustomerID FROM Account JOIN Customer ON Account.CustomerID_fk = Customer.CustomerID WHERE Customer.CustomerID = <cid> ); 
+}
+
+update updateCustomerName(int cid, String name) {
+UPDATE Customer SET FirstName = <name> WHERE Customer.CustomerID = <cid> ;}
+
+update updateBalance(int cid, int balance) {
+UPDATE Account SET Balance = <balance> WHERE Customer.CustomerID = <cid> ;}
+
+query getCustomerID(String name) {
+SELECT  CustomerID FROM Account JOIN Customer ON Account.CustomerID_fk = Customer.CustomerID WHERE Customer.FirstName = <name> ;}
+
+query getAccountID(int cid) {
+SELECT  AccountID FROM Account WHERE Account.CustomerID_fk = <cid> ;}
+
+query getBalance(int cid) {
+SELECT  Balance FROM Account JOIN Customer ON Account.CustomerID_fk = Customer.CustomerID WHERE Customer.CustomerID = <cid> ;}
+

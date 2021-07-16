@@ -1,0 +1,71 @@
+update createEmployee(int id, String name, String addr, int zip, String wkPhone, String mbPhone, String faxNumber, String email, String p_email, String title, String j_desc) {
+INSERT INTO PROJ_EMP JOIN PROJECT ON PROJ_EMP.pid_fk = PROJECT.pid JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid (eid, ename, street, zipcode, work_phone, mobile, fax, work_email, personal_email, job_title, job_desc) VALUES (<id>, <name>, <addr>, <zip>, <wkPhone>, <mbPhone>, <faxNumber>, <email>, <p_email>, <title>, <j_desc>);}
+
+update createProject(int id, String name, String desc) {
+INSERT INTO PROJECT (pid, pname, pdesc) VALUES (<id>, <name>, <desc>);}
+
+update createAssignment(int id, int projId, int empId) {
+INSERT INTO PROJ_EMP (peid, pid_fk, eid_fk) VALUES (<id>, <projId>, <empId>);}
+
+update deleteEmployee(int id) {
+DELETE FROM PROJ_EMP WHERE peid IN ( SELECT peid FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ); 
+DELETE FROM EMPLOYEE WHERE eid IN ( SELECT eid FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ); 
+DELETE FROM ADDRESS WHERE aid IN ( SELECT aid FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ); 
+DELETE FROM PHONE WHERE phid IN ( SELECT phid FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ); 
+DELETE FROM EMAIL WHERE emid IN ( SELECT emid FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ); 
+DELETE FROM JOB WHERE jid IN ( SELECT jid FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ); 
+
+  DELETE FROM PROJ_EMP WHERE PROJ_EMP.eid_fk = <id>;}
+
+update deleteProject(int id) {
+DELETE FROM PROJECT WHERE PROJECT.pid = <id>;
+  DELETE FROM PROJ_EMP WHERE PROJ_EMP.pid_fk = <id>;}
+
+update deleteAssignment(int id) {
+DELETE FROM PROJ_EMP WHERE PROJ_EMP.peid = <id>;}
+
+update updateEmployeeAddress(int id, String addr, int zip) {
+UPDATE ADDRESS SET street = <addr> WHERE EMPLOYEE.eid = <id> ;
+  UPDATE ADDRESS SET zipcode = <zip> WHERE EMPLOYEE.eid = <id> ;}
+
+update updateEmployeePhone(int id, String wkPhone, String mbPhone, String faxNumber) {
+UPDATE PHONE SET work_phone = <wkPhone> WHERE EMPLOYEE.eid = <id> ;
+  UPDATE PHONE SET mobile = <mbPhone> WHERE EMPLOYEE.eid = <id> ;
+  UPDATE PHONE SET fax = <faxNumber> WHERE EMPLOYEE.eid = <id> ;}
+
+update updateEmployeeEmail(int id, String email, String pEmail) {
+UPDATE EMAIL SET work_email = <email> WHERE EMPLOYEE.eid = <id> ;
+  UPDATE EMAIL SET personal_email = <pEmail> WHERE EMPLOYEE.eid = <id> ;}
+
+update updateEmployeeJob(int id, String title, int jDesc) {
+UPDATE JOB SET job_title = <title> WHERE EMPLOYEE.eid = <id> ;
+  UPDATE JOB SET job_desc = <jDesc> WHERE EMPLOYEE.eid = <id> ;}
+
+update updateProjectInfo(int id, String name, int desc) {
+UPDATE PROJECT SET pname = <name> WHERE PROJECT.pid = <id> ;
+  UPDATE PROJECT SET pdesc = <desc> WHERE PROJECT.pid = <id> ;}
+
+query getEmployeeId(String name) {
+SELECT  eid FROM ADDRESS JOIN EMPLOYEE ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.ename = <name> ;}
+
+query getEmployeeAddress(int id) {
+SELECT  street, zipcode FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ;}
+
+query getEmployeePhone(int id) {
+SELECT  work_phone, mobile, fax FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ;}
+
+query getEmployeeEmail(int id) {
+SELECT  work_email, personal_email FROM PROJ_EMP JOIN PROJECT ON PROJ_EMP.pid_fk = PROJECT.pid JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ;}
+
+query getEmployeeJob(int id) {
+SELECT  job_title, job_desc FROM PROJ_EMP JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.eid = <id> ;}
+
+query getProjectInfo(int id) {
+SELECT  pname, pdesc FROM PROJECT WHERE PROJECT.pid = <id> ;}
+
+query getProjEmployees(String name) {
+SELECT  ename FROM EMPLOYEE JOIN PROJ_EMP ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN PROJECT ON PROJ_EMP.pid_fk = PROJECT.pid WHERE PROJECT.pname = <name> ;}
+
+query getEmpProjects(String name) {
+SELECT  pname FROM PROJECT JOIN PROJ_EMP ON PROJ_EMP.pid_fk = PROJECT.pid JOIN EMPLOYEE ON PROJ_EMP.eid_fk = EMPLOYEE.eid JOIN ADDRESS ON EMPLOYEE.aid_fk = ADDRESS.aid JOIN PHONE ON EMPLOYEE.phid_fk = PHONE.phid JOIN EMAIL ON EMPLOYEE.emid_fk = EMAIL.emid JOIN JOB ON EMPLOYEE.jid_fk = JOB.jid WHERE EMPLOYEE.ename = <name> ;}
+

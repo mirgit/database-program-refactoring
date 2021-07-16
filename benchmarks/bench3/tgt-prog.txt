@@ -1,0 +1,32 @@
+update createEmployee(int eid, String name, String phone, String pic, String voice, String retinal) {
+INSERT INTO EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber (EmployeeNumber, Name, PhoneNumber, Picture, VoicePrint, RetinalPrint) VALUES (<eid>, <name>, <phone>, <pic>, <voice>, <retinal>);}
+
+update deleteEmployee(int eid) {
+DELETE FROM EmployeeIdentification WHERE EmployeeNumber_fk IN ( SELECT EmployeeNumber_fk FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.EmployeeNumber = <eid> ); 
+DELETE FROM Employee WHERE EmployeeNumber IN ( SELECT EmployeeNumber FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.EmployeeNumber = <eid> ); 
+}
+
+update updateEmpPhone(int eid, String phone) {
+UPDATE Employee SET PhoneNumber = <phone> WHERE Employee.EmployeeNumber = <eid> ;}
+
+query getEmployeeNumber(String name) {
+SELECT  EmployeeNumber FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.Name = <name> ;}
+
+query getEmpName(int eid) {
+SELECT  Name FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.EmployeeNumber = <eid> ;}
+
+query getEmpPhone(int eid) {
+SELECT  PhoneNumber FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.EmployeeNumber = <eid> ;}
+
+query getEmpPicture(int eid) {
+SELECT  Picture FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.EmployeeNumber = <eid> ;}
+
+query getEmpVoice(int eid) {
+SELECT  VoicePrint FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.EmployeeNumber = <eid> ;}
+
+query getEmpRetina(int eid) {
+SELECT  RetinalPrint FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.EmployeeNumber = <eid> ;}
+
+query getEmployeeInfo(int eid) {
+SELECT  Name, PhoneNumber, Picture, VoicePrint, RetinalPrint FROM EmployeeIdentification JOIN Employee ON EmployeeIdentification.EmployeeNumber_fk = Employee.EmployeeNumber WHERE Employee.EmployeeNumber = <eid> ;}
+

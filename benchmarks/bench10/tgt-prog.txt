@@ -1,0 +1,251 @@
+update createCart(int id, String created_at, String updated_at, int user_id) {
+INSERT INTO addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id (id, created_at, updated_at, user_id) VALUES (<id>, <created_at>, <updated_at>, <user_id>);}
+
+update deleteCart(int id) {
+DELETE FROM users WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM carts WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM line_items WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM items WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM orders WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+}
+
+update updateCart(int id, String updated_at, int user_id) {
+UPDATE items SET updated_at = <updated_at> WHERE carts.id = <id> ;
+  UPDATE carts SET user_id = <user_id> WHERE carts.id = <id> ;}
+
+query readCart(int id) {
+SELECT  user_id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+query readCartCreateTime(int id) {
+SELECT  created_at FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+query readCartUpdateTime(int id) {
+SELECT  updated_at FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+update createCategory(int id, String title, String description, String created_at, String updated_at) {
+INSERT INTO users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id (id, title, description, created_at, updated_at) VALUES (<id>, <title>, <description>, <created_at>, <updated_at>);}
+
+update deleteCategory(int id) {
+DELETE FROM users WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ); 
+DELETE FROM addresses WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ); 
+DELETE FROM orders WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ); 
+DELETE FROM carts WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ); 
+DELETE FROM line_items WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ); 
+DELETE FROM items WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ); 
+DELETE FROM item_categories WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ); 
+}
+
+update updateCategory(int id, String title, String description, String updated_at) {
+UPDATE items SET title = <title> WHERE addresses.id = <id> ;
+  UPDATE items SET description = <description> WHERE addresses.id = <id> ;
+  UPDATE addresses SET updated_at = <updated_at> WHERE addresses.id = <id> ;}
+
+query readCategory(int id) {
+SELECT  title, description FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE addresses.id = <id> ;}
+
+query readCategoryCreateTime(int id) {
+SELECT  created_at FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ;}
+
+query readCategoryUpdateTime(int id) {
+SELECT  updated_at FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE addresses.id = <id> ;}
+
+update createItemCategory(int id, int item_id, int category_id, String created_at, String updated_at) {
+INSERT INTO users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id (id, item_id, category_id, created_at, updated_at) VALUES (<id>, <item_id>, <category_id>, <created_at>, <updated_at>);}
+
+update deleteItemCategory(int id) {
+DELETE FROM users WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ); 
+DELETE FROM addresses WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ); 
+DELETE FROM orders WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ); 
+DELETE FROM carts WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ); 
+DELETE FROM line_items WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ); 
+DELETE FROM items WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ); 
+DELETE FROM item_categories WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ); 
+DELETE FROM categories WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ); 
+}
+
+update updateItemCategory(int id, int item_id, int category_id, String updated_at) {
+UPDATE line_items SET item_id = <item_id> WHERE line_items.id = <id> ;
+  UPDATE item_categories SET category_id = <category_id> WHERE line_items.id = <id> ;
+  UPDATE addresses SET updated_at = <updated_at> WHERE line_items.id = <id> ;}
+
+query readItemCategory(int id) {
+SELECT  item_id, category_id FROM users JOIN addresses ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ;}
+
+query readItemCategoryCreateTime(int id) {
+SELECT  created_at FROM users JOIN addresses ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ;}
+
+query readItemCategoryUpdateTime(int id) {
+SELECT  updated_at FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE line_items.id = <id> ;}
+
+update createItem(int id, String title, String description, String price, String created_at, String updated_at, String image_file_name, String image_content_type, int image_file_size, String image_updated_at, String available, String status) {
+INSERT INTO carts JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id (id, title, description, price, created_at, updated_at, image_file_name, image_content_type, image_file_size, image_updated_at, available, status) VALUES (<id>, <title>, <description>, <price>, <created_at>, <updated_at>, <image_file_name>, <image_content_type>, <image_file_size>, <image_updated_at>, <available>, <status>);}
+
+update deleteItem(int id) {
+DELETE FROM carts WHERE id IN ( SELECT id FROM carts JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE orders.id = <id> ); 
+DELETE FROM users WHERE id IN ( SELECT id FROM carts JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE orders.id = <id> ); 
+DELETE FROM orders WHERE id IN ( SELECT id FROM carts JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE orders.id = <id> ); 
+DELETE FROM line_items WHERE id IN ( SELECT id FROM carts JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE orders.id = <id> ); 
+DELETE FROM items WHERE id IN ( SELECT id FROM carts JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE orders.id = <id> ); 
+DELETE FROM item_categories WHERE id IN ( SELECT id FROM carts JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id WHERE orders.id = <id> ); 
+}
+
+update updateItem(int id, String title, String description, String price, String updated_at, String image_file_name, String image_content_type, int image_file_size, String image_updated_at, String available, String status) {
+UPDATE items SET title = <title> WHERE orders.id = <id> ;
+  UPDATE items SET description = <description> WHERE orders.id = <id> ;
+  UPDATE items SET price = <price> WHERE orders.id = <id> ;
+  UPDATE items SET updated_at = <updated_at> WHERE orders.id = <id> ;
+  UPDATE items SET image_file_name = <image_file_name> WHERE orders.id = <id> ;
+  UPDATE items SET image_content_type = <image_content_type> WHERE orders.id = <id> ;
+  UPDATE items SET image_file_size = <image_file_size> WHERE orders.id = <id> ;
+  UPDATE items SET image_updated_at = <image_updated_at> WHERE orders.id = <id> ;
+  UPDATE items SET available = <available> WHERE orders.id = <id> ;
+  UPDATE items SET status = <status> WHERE orders.id = <id> ;}
+
+query readItem(int id) {
+SELECT  title, description, price, image_file_name, image_content_type, image_file_size, image_updated_at, available, status FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE orders.id = <id> ;}
+
+query readItemCreateTime(int id) {
+SELECT  created_at FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE orders.id = <id> ;}
+
+query readItemUpdateTime(int id) {
+SELECT  updated_at FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE orders.id = <id> ;}
+
+update createLineItem(int id, int item_id, int cart_id, int quantity, String created_at, String updated_at) {
+INSERT INTO users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id (id, item_id, cart_id, quantity, created_at, updated_at) VALUES (<id>, <item_id>, <cart_id>, <quantity>, <created_at>, <updated_at>);}
+
+update deleteLineItem(int id) {
+DELETE FROM users WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM carts WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM line_items WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM items WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM item_categories WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM categories WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+DELETE FROM orders WHERE id IN ( SELECT id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ); 
+}
+
+update updateLineItem(int id, int item_id, int cart_id, int quantity, String updated_at) {
+UPDATE line_items SET item_id = <item_id> WHERE carts.id = <id> ;
+  UPDATE line_items SET cart_id = <cart_id> WHERE carts.id = <id> ;
+  UPDATE line_items SET quantity = <quantity> WHERE carts.id = <id> ;
+  UPDATE orders SET updated_at = <updated_at> WHERE carts.id = <id> ;}
+
+query readLineItem(int id) {
+SELECT  item_id, cart_id, quantity FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+query readLineItemCreateTime(int id) {
+SELECT  created_at FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+query readLineItemUpdateTime(int id) {
+SELECT  updated_at FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+update createOrder(int id, int user_id, String status, String pickup_or_delivery, String street_number, String street, String city, String state, String zip, String created_at, String updated_at, String line_items) {
+INSERT INTO users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id (id, user_id, status, pickup_or_delivery, street_number, street, city, state, zip, created_at, updated_at, line_items) VALUES (<id>, <user_id>, <status>, <pickup_or_delivery>, <street_number>, <street>, <city>, <state>, <zip>, <created_at>, <updated_at>, <line_items>);}
+
+update deleteOrder(int id) {
+DELETE FROM users WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ); 
+DELETE FROM addresses WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ); 
+DELETE FROM orders WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ); 
+DELETE FROM carts WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ); 
+DELETE FROM line_items WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ); 
+DELETE FROM items WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ); 
+DELETE FROM item_categories WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ); 
+DELETE FROM categories WHERE id IN ( SELECT id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ); 
+}
+
+update updateOrderStatus(int id, String status, String updated_at) {
+UPDATE orders SET status = <status> WHERE orders.id = <id> ;
+  UPDATE items SET updated_at = <updated_at> WHERE orders.id = <id> ;}
+
+update updateOrderPickup(int id, String pickup_or_delivery, String updated_at) {
+UPDATE orders SET pickup_or_delivery = <pickup_or_delivery> WHERE orders.id = <id> ;
+  UPDATE items SET updated_at = <updated_at> WHERE orders.id = <id> ;}
+
+update updateOrderLineItem(int id, String line_items, String updated_at) {
+UPDATE orders SET line_items = <line_items> WHERE orders.id = <id> ;
+  UPDATE items SET updated_at = <updated_at> WHERE orders.id = <id> ;}
+
+update updateOrderStreet(int id, String street_number, String street, String updated_at) {
+UPDATE addresses SET street_number = <street_number> WHERE orders.id = <id> ;
+  UPDATE addresses SET street = <street> WHERE orders.id = <id> ;
+  UPDATE items SET updated_at = <updated_at> WHERE orders.id = <id> ;}
+
+update updateOrderCity(int id, String city, String state, String zip, String updated_at) {
+UPDATE addresses SET city = <city> WHERE orders.id = <id> ;
+  UPDATE addresses SET state = <state> WHERE orders.id = <id> ;
+  UPDATE addresses SET zip = <zip> WHERE orders.id = <id> ;
+  UPDATE items SET updated_at = <updated_at> WHERE orders.id = <id> ;}
+
+query readOrder(int id) {
+SELECT  user_id, status, pickup_or_delivery, street_number, street, city, state, zip, line_items FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ;}
+
+query readOrderCreateTime(int id) {
+SELECT  created_at FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ;}
+
+query readOrderUpdateTime(int id) {
+SELECT  updated_at FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ;}
+
+update createUser(int id, String name, String password_digest, String created_at, String updated_at, String admin, String email, String username) {
+INSERT INTO addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id (id, name, password_digest, created_at, updated_at, admin, email, username) VALUES (<id>, <name>, <password_digest>, <created_at>, <updated_at>, <admin>, <email>, <username>);}
+
+update deleteUser(int id) {
+DELETE FROM addresses WHERE id IN ( SELECT id FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE users.id = <id> ); 
+DELETE FROM users WHERE id IN ( SELECT id FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE users.id = <id> ); 
+DELETE FROM carts WHERE id IN ( SELECT id FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE users.id = <id> ); 
+DELETE FROM line_items WHERE id IN ( SELECT id FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE users.id = <id> ); 
+DELETE FROM items WHERE id IN ( SELECT id FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE users.id = <id> ); 
+DELETE FROM orders WHERE id IN ( SELECT id FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE users.id = <id> ); 
+}
+
+update updateUser(int id, String name, String password_digest, String updated_at, String admin, String email, String username) {
+UPDATE users SET name = <name> WHERE users.id = <id> ;
+  UPDATE users SET password_digest = <password_digest> WHERE users.id = <id> ;
+  UPDATE orders SET updated_at = <updated_at> WHERE users.id = <id> ;
+  UPDATE users SET admin = <admin> WHERE users.id = <id> ;
+  UPDATE users SET email = <email> WHERE users.id = <id> ;
+  UPDATE users SET username = <username> WHERE users.id = <id> ;}
+
+query readUser(int id) {
+SELECT  name, password_digest, admin, email, username FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN orders ON orders.user_id = users.id WHERE users.id = <id> ;}
+
+query readUserCreateTime(int id) {
+SELECT  created_at FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE users.id = <id> ;}
+
+query readUserUpdateTime(int id) {
+SELECT  updated_at FROM carts JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id WHERE users.id = <id> ;}
+
+query readCartUser(int id) {
+SELECT  id, name, password_digest, admin, email, username FROM addresses JOIN users ON addresses.user_id = users.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+query readUserCart(int id) {
+SELECT  id, user_id FROM item_categories JOIN items ON item_categories.item_id = items.id JOIN line_items ON line_items.item_id = items.id JOIN carts ON line_items.cart_id = carts.id JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN categories ON item_categories.category_id = categories.id WHERE users.id = <id> ;}
+
+query readItemCategoryItem(int id) {
+SELECT  id, title, description, price, image_file_name, image_content_type, image_file_size, image_updated_at, available, status FROM carts JOIN users ON carts.user_id = users.id JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ;}
+
+query readItemItemCategory(int id) {
+SELECT  id, item_id, category_id FROM carts JOIN users ON carts.user_id = users.id JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ;}
+
+query readItemCategoryCategory(int id) {
+SELECT  id, title, description FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE line_items.id = <id> ;}
+
+query readCategoryItemCategory(int id) {
+SELECT  id, item_id, category_id FROM users JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE addresses.id = <id> ;}
+
+query readLineItemItem(int id) {
+SELECT  id, title, description, price, image_file_name, image_content_type, image_file_size, image_updated_at, available, status FROM item_categories JOIN items ON item_categories.item_id = items.id JOIN line_items ON line_items.item_id = items.id JOIN carts ON line_items.cart_id = carts.id JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN categories ON item_categories.category_id = categories.id WHERE carts.id = <id> ;}
+
+query readItemLineItem(int id) {
+SELECT  id, item_id, cart_id, quantity FROM item_categories JOIN items ON item_categories.item_id = items.id JOIN line_items ON line_items.item_id = items.id JOIN carts ON line_items.cart_id = carts.id JOIN users ON carts.user_id = users.id JOIN orders ON orders.user_id = users.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ;}
+
+query readLineItemCart(int id) {
+SELECT  id, user_id FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+query readCartLineItem(int id) {
+SELECT  id, item_id, cart_id, quantity FROM users JOIN carts ON carts.user_id = users.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id JOIN orders ON orders.user_id = users.id WHERE carts.id = <id> ;}
+
+query readOrderUser(int id) {
+SELECT  id, name, password_digest, admin, email, username FROM carts JOIN users ON carts.user_id = users.id JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE orders.id = <id> ;}
+
+query readUserOrder(int id) {
+SELECT  id, user_id, status, pickup_or_delivery, street_number, street, city, state, zip, line_items FROM carts JOIN users ON carts.user_id = users.id JOIN addresses ON addresses.user_id = users.id JOIN orders ON orders.address_id = addresses.id JOIN line_items ON line_items.cart_id = carts.id JOIN items ON line_items.item_id = items.id JOIN item_categories ON item_categories.item_id = items.id JOIN categories ON item_categories.category_id = categories.id WHERE users.id = <id> ;}
+
