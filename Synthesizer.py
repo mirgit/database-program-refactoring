@@ -66,6 +66,6 @@ class Synthesizer:
         raise Exception("Unable to find a proper program!")
 
 
-for b in range(8, 11):
+for b in range(1, 11):
     path = "./benchmarks/bench"+str(b)+"/"
     Synthesizer(b, path+"src-schema.txt", path+'tgt-schema.txt', path+'src-prog.txt')
