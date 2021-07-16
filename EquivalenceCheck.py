@@ -1,8 +1,9 @@
 from datetime import datetime
 from MFI import *
 from SqliteDB import SqliteDB
+# Program = {'func_name': (<inputs>{'id':int, 'name':'char'}, <body>(str))}
 
-
+prog = {'update updateEmpPhone':({'int': 'eid', 'String': 'phone'}, 'UPDATE Employee SET PhoneNumber = <phone> WHERE EmployeeNumber = <eid>;')}
 class EquivalenceCheck:
 
     def __init__(self, p, p_prime):
