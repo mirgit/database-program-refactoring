@@ -75,7 +75,7 @@ class Synthesizer:
         raise Exception("Unable to find a proper program!")
 
 
-for b in range(10, 17):
+for b in range(16, 17):
     if b in [1, 7, 10, 11, 13, 15, 18, 20]:
         continue
     path = "./benchmarks/bench"+str(b)+"/"

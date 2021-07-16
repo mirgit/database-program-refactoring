@@ -93,7 +93,11 @@ elif parsed_query[0].value == 'INSERT':
     jc = [t.strip() for t in tName.split(',')]#src_schema.get_table(t)
     attrs = [i.replace(',', '').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
     vals = [i.replace(',', '').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
-    ins = {tName+'.'+attrs[i]: vals[i] for i in range(len(vals))}
+    ins = {}
+    for i in range(len(vals)):
+        k = tName+'.'+attrs[i] if attrs[i].find('.') == -1 else attrs[i]
+        ins[k] = vals[i]
+    # ins = {tName+'.'+attrs[i]: vals[i] for i in range(len(vals))}
     # print(jc,ins)
     transaction = Insert(jc, ins)
     # transaction.to_sql()
