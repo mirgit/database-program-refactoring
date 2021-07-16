@@ -4,10 +4,6 @@ from SqliteDB import SqliteDB
 import os
 
 
-# Program = {'func_name': (<inputs>{'id':int, 'name':'char'}, <body>(str))}
-# prog = {'update updateEmpPhone':({'int': 'eid', 'String': 'phone'}, 'UPDATE Employee SET PhoneNumber = <phone> WHERE EmployeeNumber = <eid>;')}
-
-
 class EquivalenceCheck:
 
     def __init__(self, p, p_prime, src_schema_file, tgt_schema_file):
@@ -61,5 +57,3 @@ class EquivalenceCheck:
             if row not in tgt:
                 return False
         return True
-
-

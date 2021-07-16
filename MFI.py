@@ -1,9 +1,6 @@
 from random import randint
 import string
 import random
-# Program = {'func_name': ([inputs]{'id':int, 'name':'char'}, [body](str))}
-# options (update or select)  = [(inputs, body)]
-# method = (<inputs>{'id':int, 'name':'char'}, <body>(str))
 
 
 class MFI:

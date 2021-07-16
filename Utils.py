@@ -48,7 +48,6 @@ class JoinChain:
         return self
 
     def to_sql(self):
-        # print(self.chosen_join_corr)
         sql = self.chosen_join_corr[0][0].name
         for i in range(1,len(self.chosen_join_corr)):
             tup = self.chosen_join_corr[i]
@@ -57,14 +56,3 @@ class JoinChain:
             sql = sql + ' JOIN ' + tab + ' ON ' + p1 + ' = ' + p2
         return sql
 
-    # def joinChainToSql(self, join_chain):
-    #     if len(join_chain) == 0:
-    #         return ''
-    #     join_sql = join_chain[0][0]
-    #     join_chain = join_chain.pop(0)
-    #     for j in join_chain:
-    #         join_sql += ' JOIN '
-    #         join_sql += j[0]
-    #         join_sql += " ON "
-    #         join_sql += j[1][0] + " = " + j[1][1]
-    #     return join_sql

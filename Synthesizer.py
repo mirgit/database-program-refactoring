@@ -6,6 +6,8 @@ from JoinCorrSuplier import JoinCorrSupplier
 from SketchSolver import SketchSolver
 import time
 from EquivalenceCheck import EquivalenceCheck
+
+
 class Synthesizer:
     def __init__(self, b, src_schema_file, tgt_schema_file, src_program_file):
         all_time = time.time()
@@ -47,24 +49,13 @@ class Synthesizer:
                             final_trans = final_trans.replace('__', '<', 1)
                             final_trans = final_trans.replace('__', '>', 1)
                         new_func.append(final_trans)
-                    # print(new_func)
                     new_program[func_name] = (program[func_name][0], '\n  '.join(new_func))
-                # with open('example.prog','wb') as f:
-                #     pickle.dump(new_program, f)
-                # raise 1
-
-                        # for fn in transactions:
-                        #     for tr in transactions[fn]:
-                        #
-                #test the new program and return
                 if EquivalenceCheck(parse_program(src_program_file), new_program, src_schema_file, tgt_schema_file).check_equivalence():
                     file_name = src_program_file.replace('src', 'tgt')
                     save_program(new_program, file_name)
                     now = time.time()
-                    print ('time for synthesis of '+str(b) + ' is :'+str(now - start_time))
+                    print('time for synthesis of '+str(b) + ' is :'+str(now - start_time))
                     print('total time for benchmark '+str(b)+' is :'+str(now - all_time))
-                    print('num of iterations: ',iteration)
-                    print('num of value correspondances: ',value_corr)
 
                     return
                 iteration+=1
@@ -75,8 +66,6 @@ class Synthesizer:
         raise Exception("Unable to find a proper program!")
 
 
-for b in range(16, 17):
-    if b in [1, 7, 10, 11, 13, 15, 18, 20]:
-        continue
+for b in range(8, 11):
     path = "./benchmarks/bench"+str(b)+"/"
     Synthesizer(b, path+"src-schema.txt", path+'tgt-schema.txt', path+'src-prog.txt')

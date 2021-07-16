@@ -1,5 +1,3 @@
-# Python program to print connected
-# components; in an undirected graph
 class Vertex:
     def __init__(self, V):
         self.val = V

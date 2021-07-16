@@ -1,7 +1,4 @@
 from Schema import Schema
-# from SqliteDB import SqliteDB
-# import re
-
 from Table import Table
 
 # src = './benchmarkss/bench1/src-schema.txt'
@@ -10,12 +7,6 @@ from Table import Table
 
 class SchemaProvider:
     def __init__(self, src_schema_file, tgt_schema_file):
-        # self.src_db = SqliteDB("./src_db.sqlite")
-        # self.tgt_db = SqliteDB("./tgt_db.sqlite")
-        #
-        # self.src_schema = Schema({})
-        # self.tgt_schema = Schema({})
-        
         with open(src_schema_file, "r") as f:
             file = f.read()
         src_queries = file.split(';')[:-1]
@@ -27,28 +18,15 @@ class SchemaProvider:
         tgt_queries = file.split(';')[:-1]
         schema, tables = self.create_tables(tgt_queries)#, self.src_db)#, self.src_schema)
         self.tgt_schema = Schema(schema, tables)
-        # text_file = open(tgt_schema_file, "r")
-        # tgt_queries = text_file.read().replace('\n', ' ')
-        # tgt_queries = re.sub('\s+',' ',tgt_queries).split(';')
-        # if tgt_queries[-1] == ' ':
-        #     del tgt_queries[-1]
-        #
-        # text_file.close()
-        # self.create_tables(tgt_queries, self.tgt_db, self.tgt_schema)
-        
+
     def create_tables(self, table_queries):#, db, schema):
         schema = {}
         tables = []
         for q in table_queries:
-            # db.execute_query(q)
-            # if q[-1] == ' ':
-            #     print("yredjtyhfhhh")
-            #     del q[-1]
+
             table_info = self.parse_table(q)
             tables.append(Table(table_info['name'], table_info['columns'], table_info['primaryKey'], table_info['foreignKeys']))
             schema[table_info['name']] = {i[0]: i[1] for i in table_info['columns']}
-            # for s[table.name] = table.columns
-            # schema.tables.append(table)
 
         return schema, tables
 
@@ -81,4 +59,3 @@ class SchemaProvider:
         info['primaryKey'] = PK
         info['foreignKeys'] = FK
         return info
-# s = SchemaProvider()

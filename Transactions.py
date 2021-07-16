@@ -1,25 +1,5 @@
-# from itertools import combinations
-# project(['name','Id'],select('name'=='mammad',teacher*student))
 from Utils import JoinChain, Predicate
 
-#
-# class Hole:
-#     def __init__(self, hid, options):
-#         self.hid = hid
-#         self.options = options
-
-    # def infer(self):
-    #     pass#!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-# def fill_val(phi, attr):
-#     return phi[attr]
-
-
-# def attr_infer(phi, attr):
-#     # holes = []
-#     #     holes.append(Hole(id,))
-#     return phi[attr]
 
 class Insert:  # ins(j,{a_i:v_i...})
     def __init__(self, join_chain, values):
@@ -30,11 +10,6 @@ class Insert:  # ins(j,{a_i:v_i...})
         self.values = values
         self.holes = []
         self.tgt_transaction = None
-        # self.chosen_join_chain = None
-        # self.chosen_values = None
-        # self.holes_id = 0
-    # def Holer(self):
-    #     return InsertHole(self.join_chain,self.values)
 
     def genSketch(self, phi, join_corr_supplier):
         tables = [join_corr_supplier.srcSchema.get_table(t) for t in self.join_chain]
@@ -82,15 +57,10 @@ class Update:  # upd(j,pred,attr,val)
         tables = [join_corr_supplier.srcSchema.get_table(t) for t in self.join_chain]
         self.join_chain = JoinChain(tables)
         self.holes.append(self.join_chain.genSketch(phi, join_corr_supplier))
-        # if self.attr.find('.')==-1:
-        #     for t in self.join_chain.chain:
-        #         for c in t.columns:
-        #             if c[0].find(self.attr) != -1:
-        #                 self.attr = c[0]
+
         self.holes.append(phi[self.attr])
         if self.predicate is not None:
             self.holes += self.predicate.genSketch(phi)
-        # self.sk_values[h.hid] = self.values[a]
         return self.holes
 
     def fill(self, holes_value):
@@ -109,8 +79,6 @@ class Update:  # upd(j,pred,attr,val)
               ' ' + tgt_transaction.predicate.to_sql() + ' ;'
         return sql
 
-
-#     UPDATE Employee SET PhoneNumber = <phone> WHERE EmployeeNumber = <eid>;
 
 class Delete:  # del(tables,j,phi)
     def __init__(self, tablelist, predicate):
