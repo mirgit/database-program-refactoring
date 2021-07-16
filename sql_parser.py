@@ -42,7 +42,7 @@ if parsed_query[0].value == 'UPDATE':
     attr,value = [i.strip() for i in parsed_query[6].value.split('=')]
     l, op, r = [ i.strip() for i in parsed_query[8].value.replace(';','').split()[1:4]]
     transaction = Update(jc,Predicate(l,r,op),attr,value)
-    print(transaction)
+    # print(transaction)
     # while i < len(parsed_query):
     #     i, token = parsed_query.token_next(i)
     #
@@ -52,7 +52,7 @@ elif parsed_query[0].value == 'DELETE':
     l, op, r = [i.strip() for i in parsed_query[6].value.replace(';', '').split()[1:4]]
     l = jc[0] + '.' + l if l.find('.') == -1 and l[0:2] != '__'else l
     r = jc[0] + '.' + r if r.find('.') == -1 and r[0:2] != '__'else r
-    print(l,r,jc)
+    # print(l,r,jc)
     transaction = Delete(jc, Predicate(l, op, r))
 
 
@@ -81,20 +81,20 @@ elif parsed_query[0].value == 'DELETE':
         for i in range(len(holes)):
             solution.append(holes_value[str(i)])
 
-    print(solution)
+    # print(solution)
     transaction.fill(solution)
     k = transaction.to_sql()
     while k.find('__') != -1:
         k = k.replace('__', '<', 1)
         k = k.replace('__', '>', 1)
-    print(k)
+    # print(k)
 elif parsed_query[0].value == 'INSERT':
     tName = parsed_query[4].value.split()[0].strip()
     jc = [t.strip() for t in tName.split(',')]#src_schema.get_table(t)
     attrs = [i.replace(',', '').strip() for i in parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
     vals = [i.replace(',', '').strip() for i in parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
     ins = {tName+'.'+attrs[i]: vals[i] for i in range(len(vals))}
-    print(jc,ins)
+    # print(jc,ins)
     transaction = Insert(jc, ins)
     # transaction.to_sql()
     holes = transaction.genSketch(phi, join_supplier)
@@ -123,7 +123,7 @@ elif parsed_query[0].value == 'INSERT':
         for i in range(len(holes)):
             solution.append(holes_value[str(i)])
 
-    print(solution)
+    # print(solution)
     transaction.fill(solution)
 
     k =transaction.to_sql()

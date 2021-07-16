@@ -7,10 +7,15 @@ from SketchSolver import SketchSolver
 import pickle
 from EquivalenceCheck import EquivalenceCheck
 class Synthesizer:
-    def __init__(self, srs_schema_file, tgt_schema_file, srs_program_file):
-        S = SchemaProvider(srs_schema_file, tgt_schema_file)
+    def __init__(self, src_schema_file, tgt_schema_file, src_program_file):
+        S = SchemaProvider(src_schema_file, tgt_schema_file)
         src_schema, tgt_schema = [S.src_schema, S.tgt_schema]
-        program = parse_program(srs_program_file)
+        program = parse_program(src_program_file)
+        for func_name in program:
+            trans = program[func_name][1]
+            trans = trans.replace('<','__')
+            trans = trans.replace('>','__')
+            program[func_name] = (program[func_name][0],trans)
         phi_generator = ValCorrGenerator(src_schema, tgt_schema)
         join_supplier = JoinCorrSupplier(src_schema, tgt_schema)
         phi = phi_generator.get_solution()
@@ -33,8 +38,12 @@ class Synthesizer:
                     new_func = []
                     for trans in transactions[func_name]:
                         trans.fill(holes_value)
-                        new_func.append(trans.to_sql())
-                    print(new_func)
+                        final_trans = trans.to_sql()
+                        while final_trans.find('__') != -1:
+                            final_trans = final_trans.replace('__', '<', 1)
+                            final_trans = final_trans.replace('__', '>', 1)
+                        new_func.append(final_trans)
+                    # print(new_func)
                     new_program[func_name] = (program[func_name][0], '\n  '.join(new_func))
                 # with open('example.prog','wb') as f:
                 #     pickle.dump(new_program, f)
@@ -44,8 +53,8 @@ class Synthesizer:
                         #     for tr in transactions[fn]:
                         #
                 #test the new program and return
-                if EquivalenceCheck(program, new_program):
-                    file_name = srs_program_file.replace('srs', 'tgt')
+                if EquivalenceCheck(parse_program(src_program_file), new_program, src_schema_file, tgt_schema_file).check_equivalence():
+                    file_name = src_program_file.replace('src', 'tgt')
                     save_program(new_program, file_name)
                     return
                 holes_value = solver.get_solution()
@@ -53,5 +62,5 @@ class Synthesizer:
             phi = phi_generator.get_solution()
         raise Exception("Unable to find a proper program!")
 
-path = "./benchmarks/bench3/"
+path = "./benchmarks/bench6/"
 Synthesizer(path+"src-schema.txt", path+'tgt-schema.txt', path+'src-prog.txt')

@@ -24,6 +24,7 @@ class SqliteDB:
             self.db.commit()
             print("Query executed successfully")
         except Error as e:
+            print(query)
             print(f"The error '{e}' occurred")
             
         cursor = self.db.cursor()
@@ -32,16 +33,19 @@ class SqliteDB:
             self.db.commit()
             print("Query executed successfully")
         except Error as e:
+            print(query)
             print(f"The error '{e}' occurred")
 
     def execute_read_query(self, query):
         cursor = self.db.cursor()
         result = None
         try:
+            print(query)
             cursor.execute(query)
             result = cursor.fetchall()
             return result
         except Error as e:
+            print(query)
             print(f"The error '{e}' occurred")
             return []
 
@@ -49,4 +53,4 @@ class SqliteDB:
         with open(file_name, 'r') as f:
             batch = f.read()
         for query in batch.split(';')[:-1]:
-            self.execute_read_query(query+';')
+            self.execute_query(query+';')

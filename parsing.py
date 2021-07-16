@@ -24,8 +24,6 @@ def parse_program(program_file):
         name, params = k.split('(')
         params = params[:-1]
         params = params.split(',')
-        trans = trans.replace('<','__')
-        trans = trans.replace('>','__')
         program[name] = ({i.strip().split(' ')[1]: i.strip().split(' ')[0] for i in params}, trans)
     return program
 
@@ -53,7 +51,7 @@ def sql_to_transaction(transaction):
 
     elif parsed_query[0].value == 'INSERT':
         # phi = phi_generator.get_solution()
-        print([i.value for i in parsed_query.tokens])
+        # print([i.value for i in parsed_query.tokens])
         if parsed_query[4].value.find('(') != -1:
             tName = parsed_query[4].value.split()[0].strip()
             attrs = [i.replace(',', '').strip() for i in

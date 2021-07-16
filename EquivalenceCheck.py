@@ -6,7 +6,7 @@ from SqliteDB import SqliteDB
 prog = {'update updateEmpPhone':({'int': 'eid', 'String': 'phone'}, 'UPDATE Employee SET PhoneNumber = <phone> WHERE EmployeeNumber = <eid>;')}
 class EquivalenceCheck:
 
-    def __init__(self, p, p_prime):
+    def __init__(self, p, p_prime, src_schema_file, tgt_schema_file):
         self.p = {'update': [], 'query': []}
         self.p_prime = {'update': [], 'query': []}
         for func in p:
@@ -20,8 +20,10 @@ class EquivalenceCheck:
             elif 'query' in func:
                 self.p_prime['query'].append(p_prime[func])
 
-        self.src_db = SqliteDB('src_db')
-        self.tgt_db = SqliteDB('tgt_db')
+        self.src_db = SqliteDB(src_schema_file.replace('txt','sqlite'))
+        self.tgt_db = SqliteDB(tgt_schema_file.replace('txt','sqlite'))
+        self.src_db.create_tables(src_schema_file)
+        self.tgt_db.create_tables(tgt_schema_file)
 
     def check_equivalence(self):
         mfi = MFI()

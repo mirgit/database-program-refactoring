@@ -63,6 +63,7 @@ class Insert:  # ins(j,{a_i:v_i...})
             cols.append(c.split('.')[1])
             vals.append(self.tgt_transaction.values[c])
         sql = sql + ' '+str(tuple(cols))+' VALUES '+str(tuple(vals))+';'
+        sql = sql.replace('\'','')
         return sql
 
 
@@ -190,7 +191,7 @@ class Select:  # proj(attrs, Q(j))
         sql = 'SELECT '
         for c in self.tgt_transaction.attrs:
             cols.append(c.split('.')[1])
-        sql += sql + ' ' + str(tuple(cols))
+        sql += ' ' + str(tuple(cols))
         sql += ' FROM ' + self.tgt_transaction.join_chain.to_sql()
         if self.predicate is not None:
             sql += ' ' + self.predicate.to_sql()
