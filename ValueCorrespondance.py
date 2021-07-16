@@ -41,6 +41,8 @@ class ValCorrGenerator:
                 self.cnf.add_soft(x[i][j], similarity)
         self.vars = x
         self.solution = {attr: [] for attr in self.S1.cols}  ##!!!!!!only queried attrs are needed
+        for attr in self.S1.cols:
+            self.solution[attr.split('.')[1]] = []  ##!!!!!!only queried attrs are needed
 
     def get_solution(self):
         check = self.cnf.check()
@@ -54,6 +56,8 @@ class ValCorrGenerator:
                 if m[var]:
                     solution.append(self.vars[int(i)][int(j)])
                     self.solution[self.S1.id_to_name(int(i))].append(self.S2.id_to_name(int(j)))
+                    self.solution[self.S1.id_to_name(int(i)).split('.')[1]].append(self.S2.id_to_name(int(j)))
+
                 else:
                     solution.append(Not(self.vars[int(i)][int(j)]))
             self.cnf.push()

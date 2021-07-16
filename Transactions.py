@@ -81,6 +81,11 @@ class Update:  # upd(j,pred,attr,val)
         tables = [join_corr_supplier.srcSchema.get_table(t) for t in self.join_chain]
         self.join_chain = JoinChain(tables)
         self.holes.append(self.join_chain.genSketch(phi, join_corr_supplier))
+        # if self.attr.find('.')==-1:
+        #     for t in self.join_chain.chain:
+        #         for c in t.columns:
+        #             if c[0].find(self.attr) != -1:
+        #                 self.attr = c[0]
         self.holes.append(phi[self.attr])
         if self.predicate is not None:
             self.holes += self.predicate.genSketch(phi)
