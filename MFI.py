@@ -9,32 +9,44 @@ import random
 class MFI:
 
     def __init__(self):
-        self.query = None
-        self.updates = []
+        self.src_query = None
+        self.src_updates = []
+        self.tgt_query = None
+        self.tgt_updates = []
         self.last_id = 0
 
-    def add_update_transaction(self, options):
-        t = options[randint(0, len(options)-1)]
-        valuation = self.get_random_valuation(t)
-        self.updates.append((t[1], valuation))
+    def add_update_transaction(self, src_options, tgt_options):
+        i = randint(0, len(tgt_options)-1)
+        t1 = src_options[i]
+        t2 = tgt_options[i]
+        valuation = self.get_random_valuation(t1)
+        self.tgt_updates.append((t2[1], valuation))
+        self.src_updates.append((t1[1], valuation))
         
-    def choose_query(self, options):
-        method = options[randint(0, len(options)-1)]
-        valuation = self.get_random_valuation(method)
-        self.query = (method[1], valuation)
-        return method, valuation
+    def choose_query(self, src_options, tgt_options):
+        i = randint(0, len(tgt_options) - 1)
+        t1 = src_options[i]
+        t2 = tgt_options[i]
+        valuation = self.get_random_valuation(t1)
+        
+        self.src_query = (t1[1], valuation)
+        self.tgt_query = (t2[1], valuation)
 
-    def replace_random_update(self, options):
-        i = randint(0, len(self.updates)-1)
-        method = options[randint(0, len(options)-1)]
-        valuation = self.get_random_valuation(method)
-        self.updates[i] = (method[1], valuation)
+    def replace_random_update(self, src_options, tgt_options):
+        i = randint(0, len(tgt_options) - 1)
+        t1 = src_options[i]
+        t2 = tgt_options[i]
+        valuation = self.get_random_valuation(t1)
+        j = randint(0, len(self.tgt_updates)-1)
+        self.tgt_updates[j] = (t2[1], valuation)
+        self.src_updates[j] = (t1[1], valuation)
 
     def get_random_id(self):
-        return self.last_id + 1
+        self.last_id += 1
+        return self.last_id
 
-    def run_in_DB(self, db):
-        for u in self.updates:
+    def run_src_db(self, db):
+        for u in self.src_updates:
             # replace args with values
             method = u[0]
             for arg, val in u[1].items():
@@ -48,23 +60,54 @@ class MFI:
             for transaction in transactions:
                 db.execute_query(transaction)
 
-        method = self.query[0]
+        method = self.src_query[0]
         # print(method)
-        for arg, val in self.query[1].items():
+        for arg, val in self.src_query[1].items():
             if isinstance(val, str):
                 val = '"' + val + '"'
             arg2 = '<' + arg + '>'
             while arg2 in method:
                 method = method.replace(arg2, str(val))
         transactions = method.split(';')[:-1]
-        return db.execute_read_query(transactions[0])
+        q1 = db.execute_read_query(transactions[0])
+        return q1
+
+    def run_tgt_db(self, db):
+        for u in self.tgt_updates:
+            # replace args with values
+            method = u[0]
+            for arg, val in u[1].items():
+                if isinstance(val, str):
+                    val = '"' + val + '"'
+                arg2 = '<' + arg + '>'
+                while arg2 in method:
+                    method = method.replace(arg2, str(val))
+
+            transactions = method.split(';')[:-1]
+            for transaction in transactions:
+                db.execute_query(transaction)
+
+        method = self.tgt_query[0]
+        # print(method)
+        for arg, val in self.tgt_query[1].items():
+            if isinstance(val, str):
+                val = '"' + val + '"'
+            arg2 = '<' + arg + '>'
+            while arg2 in method:
+                method = method.replace(arg2, str(val))
+        transactions = method.split(';')[:-1]
+        q1 = db.execute_read_query(transactions[0])
+        return q1
 
     def get_random_valuation(self, method):
         args, body = method
         attrs = {}
         for arg, t in args.items():
             if t == 'int':
-                random_attr = get_random_int()
+                if 'id' in arg or 'ID' in arg or 'Id' in arg:
+                    random_attr = self.get_random_id()
+                else:
+                    random_attr = get_random_int()
                 attrs[arg] = random_attr
 
             elif t == 'String':
@@ -72,6 +115,7 @@ class MFI:
                 attrs[arg] = random_attr
             else:
                 print("****************   invalid type " + t + "***************")
+                raise Exception("invalid type " + t)
         return attrs
 
 

@@ -83,11 +83,7 @@ execute_query(connection, add_addr)
 d = execute_read_query(connection, q)
 d2 = execute_read_query(connection, q)
 print(d)
-for i in d:
-    if i in d2:
-        print("check")
-    else:
-        print("booooooooooooooooo")
+
 
 
 # class Sqlite:

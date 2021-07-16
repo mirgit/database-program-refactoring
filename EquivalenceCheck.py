@@ -1,9 +1,13 @@
 from datetime import datetime
 from MFI import *
 from SqliteDB import SqliteDB
-# Program = {'func_name': (<inputs>{'id':int, 'name':'char'}, <body>(str))}
+import os
 
-prog = {'update updateEmpPhone':({'int': 'eid', 'String': 'phone'}, 'UPDATE Employee SET PhoneNumber = <phone> WHERE EmployeeNumber = <eid>;')}
+
+# Program = {'func_name': (<inputs>{'id':int, 'name':'char'}, <body>(str))}
+# prog = {'update updateEmpPhone':({'int': 'eid', 'String': 'phone'}, 'UPDATE Employee SET PhoneNumber = <phone> WHERE EmployeeNumber = <eid>;')}
+
+
 class EquivalenceCheck:
 
     def __init__(self, p, p_prime, src_schema_file, tgt_schema_file):
@@ -19,21 +23,30 @@ class EquivalenceCheck:
                 self.p_prime['update'].append(p_prime[func])
             elif 'query' in func:
                 self.p_prime['query'].append(p_prime[func])
+        src_db = src_schema_file.replace('txt', 'sqlite')
+        if os.path.exists(src_db):
+            os.remove(src_db)
 
-        self.src_db = SqliteDB(src_schema_file.replace('txt','sqlite'))
-        self.tgt_db = SqliteDB(tgt_schema_file.replace('txt','sqlite'))
+        tgt_db = tgt_schema_file.replace('txt', 'sqlite')
+        if os.path.exists(tgt_db):
+            os.remove(tgt_db)
+        if os.path.exists(tgt_db):
+            os.remove(tgt_db)
+
+        self.src_db = SqliteDB(src_db)
+        self.tgt_db = SqliteDB(tgt_db)
         self.src_db.create_tables(src_schema_file)
         self.tgt_db.create_tables(tgt_schema_file)
 
     def check_equivalence(self):
         mfi = MFI()
         for i in range(20):
-            mfi.add_update_transaction(self.p['update'])
+            mfi.add_update_transaction(self.p['update'], self.p_prime['update'])
             for j in range(10):
-                mfi.choose_query(self.p['query'])
-                mfi.replace_random_update(options=self.p['update'])
-                src_result = mfi.run_in_DB(self.src_db)
-                tgt_result = mfi.run_in_DB(self.tgt_db)
+                mfi.choose_query(self.p['query'], self.p_prime['query'])
+                mfi.replace_random_update(self.p['update'], self.p_prime['update'])
+                src_result = mfi.run_src_db(self.src_db)
+                tgt_result = mfi.run_tgt_db(self.tgt_db)
                 is_equivalent = self.check_results(src_result, tgt_result)
                 if not is_equivalent:
                     return False

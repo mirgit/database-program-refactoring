@@ -1,11 +1,11 @@
 import sqlite3
 from sqlite3 import Error
+import logging
+
 
 class SqliteDB:
     def __init__(self, db_name):
         self.db = self.create_connection(db_name)
-        # TODO create tables from schema
-
 
     def create_connection(self, path):
         connection = None
@@ -13,7 +13,7 @@ class SqliteDB:
             connection = sqlite3.connect(path)
             print("Connection to SQLite DB successful")
         except Error as e:
-            print(f"The error '{e}' occurred")
+            logging.error(f"The error '{e}' occurred")
 
         return connection
 
@@ -22,31 +22,18 @@ class SqliteDB:
         try:
             cursor.execute(query)
             self.db.commit()
-            print("Query executed successfully")
         except Error as e:
-            print(query)
-            print(f"The error '{e}' occurred")
-            
-        cursor = self.db.cursor()
-        try:
-            cursor.execute(query)
-            self.db.commit()
-            print("Query executed successfully")
-        except Error as e:
-            print(query)
-            print(f"The error '{e}' occurred")
+            pass
 
     def execute_read_query(self, query):
         cursor = self.db.cursor()
         result = None
         try:
-            print(query)
+            # print(query)
             cursor.execute(query)
             result = cursor.fetchall()
             return result
         except Error as e:
-            print(query)
-            print(f"The error '{e}' occurred")
             return []
 
     def create_tables(self, file_name):
