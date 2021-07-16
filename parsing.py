@@ -1,6 +1,15 @@
 import sqlparse
 from Transactions import *
 
+def save_program(program,file_name):
+    with open(file_name, 'w') as file_writer:
+        for function_name in program:
+            arg_list = [program[function_name][0][item]+' '+item for item in program[function_name][0]]
+            args = ', '.join(arg_list)
+            file_writer.write(function_name+'('+args+') {\n')
+            file_writer.write(program[function_name][1])
+            file_writer.write('}\n\n')
+    # print(program)
 
 def parse_program(program_file):
     with open(program_file, 'r') as f:
@@ -44,14 +53,20 @@ def sql_to_transaction(transaction):
 
     elif parsed_query[0].value == 'INSERT':
         # phi = phi_generator.get_solution()
-        tName = parsed_query[4].value.split()[0].strip()
+        print([i.value for i in parsed_query.tokens])
+        if parsed_query[4].value.find('(') != -1:
+            tName = parsed_query[4].value.split()[0].strip()
+            attrs = [i.replace(',', '').strip() for i in
+                     parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
+            vals = [i.replace(',', '').strip() for i in
+                    parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
+            ins = {tName + '.' + attrs[i]: vals[i] for i in range(len(vals))}
+        else:
+            raise Exception("insert with a join!")
+
         # jc = [src_schema.get_table(t) for t in tName.split(',')]
+
         jc = [t.strip() for t in tName.split(',')]
-        attrs = [i.replace(',', '').strip() for i in
-                 parsed_query[4].value.replace('(', '').replace(')', '').split()[1:]]
-        vals = [i.replace(',', '').strip() for i in
-                parsed_query[6].value.replace('(', '').replace(')', '').split()[1:]]
-        ins = {tName + '.' + attrs[i]: vals[i] for i in range(len(vals))}
         transaction = Insert(jc, ins)
         return transaction
         # transaction.to_sql()

@@ -177,9 +177,10 @@ class Select:  # proj(attrs, Q(j))
 
     def fill(self, holes_value):
         T = self.join_chain.fill(holes_value)
-        attrs = {}
-        for attr in self.attrs:
-            attrs[holes_value[0]] = self.attrs[attr]
+        holes_value.pop(0)
+        attrs = []
+        for i in range(len(self.attrs)):
+            attrs.append(holes_value[0])
             holes_value.pop(0)
         P = self.predicate.fill(holes_value) if self.predicate is not None else None
         self.tgt_transaction = Select(attrs, T, P)
@@ -187,7 +188,7 @@ class Select:  # proj(attrs, Q(j))
     def to_sql(self):
         cols =[]
         sql = 'SELECT '
-        for c in self.tgt_transaction.values:
+        for c in self.tgt_transaction.attrs:
             cols.append(c.split('.')[1])
         sql += sql + ' ' + str(tuple(cols))
         sql += ' FROM ' + self.tgt_transaction.join_chain.to_sql()
