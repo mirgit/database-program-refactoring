@@ -43,6 +43,7 @@ class SqliteDB:
             return result
         except Error as e:
             print(f"The error '{e}' occurred")
+            return []
 
     def create_tables(self, file_name):
         with open(file_name, 'r') as f:
